@@ -1,7 +1,7 @@
-package com.fly;
+package com.fly.maker;
 
 
-import com.fly.cli.CommandExecutor;
+import com.fly.maker.cli.CommandExecutor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
