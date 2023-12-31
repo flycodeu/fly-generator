@@ -29,4 +29,27 @@ public class MainGenerator {
         model.setAuthor("flycode");
         DynamicGenerator.doGenerate(dynamicInputPath, dynamicOutputPath, model);
     }
+
+
+    public static void doGenerate(MainTemplateConfig mainTemplateConfig) throws IOException, TemplateException {
+        // 静态生成
+        //  获取项目路径
+        String projectPath = System.getProperty("user.dir");
+        //System.out.println(projectPath);
+        // 整个项目的根路径
+        File parentFile = new File(projectPath).getParentFile();
+        // 输入路径
+        String inputPath = new File(parentFile, "fly-generator-demo-projects/acm-template").getAbsolutePath();
+        //System.out.println(inputPath);
+        // 输出路径
+        String targetPath = projectPath;
+        //copyFilesByHutool(inputPath, targetPath);
+        StaticGenerator.copyFilesByRecursive(inputPath, targetPath);
+
+        // 动态生成
+        String dynamicInputPath = projectPath + File.separator + "src/main/resources/templates/MainTemplate.java.ftl";
+        String dynamicOutputPath = targetPath + File.separator + "acm-template/src/com/yupi/acm/MainTemplate.java";
+
+        DynamicGenerator.doGenerate(dynamicInputPath, dynamicOutputPath, mainTemplateConfig);
+    }
 }
