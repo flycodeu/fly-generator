@@ -5,6 +5,7 @@
   "version": "1.0",
   "author": "fly",
   "createTime": "2023-12-22",
+  "useGit": false,
   "fileConfig": {
     "inputRootPath": ".source/acm-template-pro",
     "outputRootPath": "generated",

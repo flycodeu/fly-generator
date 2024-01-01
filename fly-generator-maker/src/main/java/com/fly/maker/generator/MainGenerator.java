@@ -131,10 +131,9 @@ public class MainGenerator {
         String jarPath = "target/" + jarName;
         ScriptGenerator.doGenerate(shellOutPutFilePath, jarPath);
 
-
         // 精简版程序包，只有源模板和jar，脚本
         // 目标地址就是和之前的目录同级别加了-dist
-        String destOutPutPath = outputPath +"-dest";
+        String destOutPutPath = outputPath + "-dest";
         // 复制jar包
         // 复制jar包的最终地址
         String targetJarAbsolutePath = destOutPutPath + File.separator + "target";
@@ -146,10 +145,22 @@ public class MainGenerator {
 
         // 复制脚本
         FileUtil.copy(shellOutPutFilePath, destOutPutPath, true);
-        FileUtil.copy(shellOutPutFilePath+".bat",destOutPutPath,true);
+        FileUtil.copy(shellOutPutFilePath + ".bat", destOutPutPath, true);
 
         // 复制源模板
         FileUtil.copy(sourceCopyDestPath, destOutPutPath, true);
 
+
+        // 构建git，这个需要在整个目录下
+        // todo 用户可以选择
+        if (meta.getUseGit()) {
+            String gitOutPutFilePath = meta.getFileConfig().getOutputRootPath();
+            System.out.println("gitignore--->" + gitOutPutFilePath);
+            GitGenerator.doGenerator(gitOutPutFilePath);
+            inputFilePath = inputResourcePath + "templates/.gitignore.ftl";
+            outputFilePath = gitOutPutFilePath + File.separator + ".gitignore";
+            System.out.println("gitignore--->" + outputFilePath);
+            DynamicFileGenerator.doGenerate(inputFilePath, outputFilePath, meta);
+        }
     }
 }

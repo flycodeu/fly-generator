@@ -17,6 +17,7 @@ public class Meta {
     private String createTime;
     private FileConfig fileConfig;
     private ModelConfig modelConfig;
+    private Boolean useGit;
 
     @NoArgsConstructor
     @Data
