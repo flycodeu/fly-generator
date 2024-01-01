@@ -22,9 +22,9 @@ public class MainGenerator {
 
         // 输出路径
         String projectPath = System.getProperty("user.dir");
-        String outputPath = projectPath + File.separator + "generated";
+        String outputPath = projectPath + File.separator + "generated" + File.separator + meta.getName();
         //String outputPath = meta.getFileConfig().getOutputRootPath() + File.separator + "generated";
-        System.out.println(outputPath);
+        //System.out.println(outputPath);
         // 不存在路径
         if (!FileUtil.exist(outputPath)) {
             FileUtil.mkdir(outputPath);
@@ -131,6 +131,25 @@ public class MainGenerator {
         String jarPath = "target/" + jarName;
         ScriptGenerator.doGenerate(shellOutPutFilePath, jarPath);
 
+
+        // 精简版程序包，只有源模板和jar，脚本
+        // 目标地址就是和之前的目录同级别加了-dist
+        String destOutPutPath = outputPath +"-dest";
+        // 复制jar包
+        // 复制jar包的最终地址
+        String targetJarAbsolutePath = destOutPutPath + File.separator + "target";
+        // 创建target目录
+        FileUtil.mkdir(targetJarAbsolutePath);
+        // 源jar包
+        String jarAbsolutePath = outputPath + File.separator + jarPath;
+        FileUtil.copy(jarAbsolutePath, targetJarAbsolutePath, true);
+
+        // 复制脚本
+        FileUtil.copy(shellOutPutFilePath, destOutPutPath, true);
+        FileUtil.copy(shellOutPutFilePath+".bat",destOutPutPath,true);
+
+        // 复制源模板
+        FileUtil.copy(sourceCopyDestPath, destOutPutPath, true);
 
     }
 }
