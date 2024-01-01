@@ -21,14 +21,20 @@ public class MainGenerator {
         System.out.println(meta);
 
         // 输出路径
-        //String projectPath = System.getProperty("user.dir");
-        // String outputPath = projectPath + File.separator + "generated";
-        String outputPath = meta.getFileConfig().getOutputRootPath() + File.separator + "generated";
+        String projectPath = System.getProperty("user.dir");
+        String outputPath = projectPath + File.separator + "generated";
+        //String outputPath = meta.getFileConfig().getOutputRootPath() + File.separator + "generated";
         System.out.println(outputPath);
         // 不存在路径
         if (!FileUtil.exist(outputPath)) {
             FileUtil.mkdir(outputPath);
         }
+
+        // 原始模板路径复制到生成的代码包中去
+        String sourceRootPath = meta.getFileConfig().getSourceRootPath();
+        String sourceCopyDestPath = outputPath + File.separator + ".source";
+        FileUtil.copy(sourceRootPath, sourceCopyDestPath, false);
+
         // 读取resource
         ClassPathResource classPathResource = new ClassPathResource("");
         String inputResourcePath = classPathResource.getAbsolutePath();
@@ -110,6 +116,12 @@ public class MainGenerator {
         //System.out.println(outputFilePath);
         DynamicFileGenerator.doGenerate(inputFilePath, outputFilePath, meta);
 
+        // 生成README文件
+        inputFilePath = inputResourcePath + "templates/README.md.ftl";
+        outputFilePath = outputPath + File.separator + "README.md";
+        //System.out.println(outputFilePath);
+        DynamicFileGenerator.doGenerate(inputFilePath, outputFilePath, meta);
+
         // 构建jar
         JarGenerator.doGenerator(outputPath);
 
@@ -118,5 +130,7 @@ public class MainGenerator {
         String jarName = String.format("%s-%s-jar-with-dependencies.jar", meta.getName(), meta.getVersion());
         String jarPath = "target/" + jarName;
         ScriptGenerator.doGenerate(shellOutPutFilePath, jarPath);
+
+
     }
 }
