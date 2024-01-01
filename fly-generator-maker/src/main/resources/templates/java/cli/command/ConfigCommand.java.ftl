@@ -1,7 +1,7 @@
-package com.fly.maker.cli.Command;
+package ${basePackage}.cli.Command;
 
 import cn.hutool.core.util.ReflectUtil;
-import com.fly.maker.model.DataModel;
+import ${basePackage}.model.DataModel;
 import picocli.CommandLine;
 
 import java.lang.reflect.Field;
@@ -15,8 +15,6 @@ public class ConfigCommand implements Runnable {
     @Override
     public void run() {
         System.out.println("查看参数信息");
-//        Class<DataModel.java.ftl> mainTemplateConfigClass = DataModel.java.ftl.class;
-//        Field[] fields = mainTemplateConfigClass.getFields();
         Field[] fields = ReflectUtil.getFields(DataModel.class);
         for (Field field : fields) {
             System.out.println("字段名称" + field.getName());

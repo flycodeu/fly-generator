@@ -1,18 +1,14 @@
-package com.fly.maker.cli;
+package ${basePackage}.cli;
 
-import com.fly.maker.cli.Command.ConfigCommand;
-import com.fly.maker.cli.Command.GenerateCommand;
-import com.fly.maker.cli.Command.ListGenerateCommand;
+import ${basePackage}.cli.Command.ConfigCommand;
+import ${basePackage}.cli.Command.GenerateCommand;
+import ${basePackage}.cli.Command.ListGenerateCommand;
 import picocli.CommandLine;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * 主命令
  */
-@CommandLine.Command( name = "fly", mixinStandardHelpOptions = true )
+@CommandLine.Command( name = "${name}", mixinStandardHelpOptions = true )
 public class CommandExecutor implements Runnable {
     private final CommandLine commandLine;
     {
@@ -22,7 +18,6 @@ public class CommandExecutor implements Runnable {
                 .addSubcommand(new ListGenerateCommand());
 
     }
-
 
 
     @Override

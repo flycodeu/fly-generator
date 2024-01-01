@@ -1,4 +1,4 @@
-package com.fly.maker.cli.Command;
+package ${basePackage}.cli.Command;
 
 import cn.hutool.core.io.FileUtil;
 import picocli.CommandLine;
@@ -14,11 +14,8 @@ public class ListGenerateCommand implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("list command");
-        String projectPath = System.getProperty("user.dir");
-        File parentFile = new File(projectPath).getParentFile();
         // 输入路径
-        String inputPath = new File(parentFile, "fly-generator-demo-projects/acm-template").getAbsolutePath();
+        String inputPath = "${fileConfig.inputRootPath}";
         List<File> files = FileUtil.loopFiles(inputPath);
         for (File file : files) {
             System.out.println(file);

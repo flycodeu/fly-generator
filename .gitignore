@@ -2,6 +2,7 @@
 .idea
 fly-generator.iml
 fly-generator-demo-projects.iml
+generated
 
 ### Java template
 # Compiled class file

@@ -7,7 +7,7 @@
   "createTime": "2023-12-22",
   "fileConfig": {
     "inputRootPath": "D:/fly/project/fly-generator/fly-generator/fly-generator-demo-projects/acm-template-pro",
-    "outputRootPath": "generated",
+    "outputRootPath": "D:/fly/project/fly-generator/fly-generator",
     "type": "dir",
     "files": [
       {

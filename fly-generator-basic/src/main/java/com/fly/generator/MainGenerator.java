@@ -30,8 +30,30 @@ public class MainGenerator {
         DynamicGenerator.doGenerate(dynamicInputPath, dynamicOutputPath, model);
     }
 
-
     public static void doGenerate(MainTemplateConfig mainTemplateConfig) throws IOException, TemplateException {
+        String inputRootPath = "D:/fly/project/fly-generator/fly-generator/fly-generator-demo-projects/acm-template-pro";
+        String outputRootPath = "generated";
+
+
+        String inputPath;
+        String outputPath;
+
+        // 动态文件生成
+        inputPath = new File(inputRootPath, "src/main/resources/templates/MainTemplate.java.ftl").getAbsolutePath();
+        outputPath = new File(outputRootPath, "src/main/yupi/acm/MainTemplate.java").getAbsolutePath();
+        DynamicGenerator.doGenerate(inputPath, outputPath, mainTemplateConfig);
+
+        // 静态文件生成
+        inputPath = new File(inputRootPath, ".gitignore").getAbsolutePath();
+        outputPath = new File(outputRootPath, ".gitignore").getAbsolutePath();
+        StaticGenerator.copyFilesByRecursive(inputPath, outputPath);
+
+        inputPath = new File(inputRootPath, ".README").getAbsolutePath();
+        outputPath = new File(outputRootPath, ".README").getAbsolutePath();
+        StaticGenerator.copyFilesByRecursive(inputPath, outputPath);
+    }
+
+    public static void doGenerateDepreated(MainTemplateConfig mainTemplateConfig) throws IOException, TemplateException {
         // 静态生成
         //  获取项目路径
         String projectPath = System.getProperty("user.dir");
