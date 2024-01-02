@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 public class DataModel {
 
+    private Boolean needGit;
     /**
      * 作者注释
      */
