@@ -13,7 +13,7 @@ public class MetaManager {
     /**
      * 防止外部实例化
      */
-    public MetaManager() {
+    private MetaManager() {
     }
 
     /**
@@ -41,8 +41,8 @@ public class MetaManager {
     private static Meta initMeta() {
         String metaJson = ResourceUtil.readUtf8Str("meta.json");
         Meta newMeta = JSONUtil.toBean(metaJson, Meta.class);
-        Meta.FileConfig fileConfig = newMeta.getFileConfig();
-        //todo 需要判断参数是否正常
+        //需要判断参数是否正常
+        MetaValidator.doValidateAndFill(newMeta);
         return newMeta;
     }
 }
