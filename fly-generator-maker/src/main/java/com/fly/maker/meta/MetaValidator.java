@@ -6,6 +6,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import com.fly.maker.meta.enums.FileGenerateTypeEnum;
 import com.fly.maker.meta.enums.FileTypeEnum;
+import com.fly.maker.meta.enums.ModelTypeEnum;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -39,7 +40,7 @@ public class MetaValidator {
         for (Meta.ModelConfig.ModelInfo modelInfo : models) {
             // 必填
             String fieldName = modelInfo.getFieldName();
-            String modelInfoType = StrUtil.blankToDefault(modelInfo.getType(), "String");
+            String modelInfoType = StrUtil.blankToDefault(modelInfo.getType(), ModelTypeEnum.STRING.getValue());
             modelInfo.setType(modelInfoType);
 
             if (StrUtil.isBlank(fieldName)) {
@@ -62,7 +63,7 @@ public class MetaValidator {
         // .source+sourceRootPath最后一个层级的路径
         String defaultInputRootPath = ".source/" + FileUtil.getLastPathEle(Paths.get(sourceRootPath).toAbsolutePath()).getFileName().toString();
         String defaultOutputRootPath = "generated";
-        String defaultType = "dir";
+        String defaultType = FileTypeEnum.DIR.getValue();
 
 
         String type = fileConfig.getType();
