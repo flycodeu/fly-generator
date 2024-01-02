@@ -12,6 +12,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 元信息校验
@@ -95,6 +96,12 @@ public class MetaValidator {
             String outputPath = fileInfo.getOutputPath();
             String fileInfoType = fileInfo.getType();
             String generateType = fileInfo.getGenerateType();
+
+            // 如果是分组就不需要校验
+            if (Objects.equals(fileInfoType, FileTypeEnum.GROUP.getValue())){
+                continue;
+            }
+
             // 必填
             if (StrUtil.isBlank(inputPath)) {
                 throw new MetaException("文件配置中文件信息未填写输入路径");

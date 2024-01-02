@@ -35,7 +35,11 @@ public class Meta {
             private String outputPath;
             private String type;
             private String generateType;
+            // 分组条件
             private String condition;
+            private String groupKey;
+            private String groupName;
+            private List<FileInfo> files;
         }
     }
 
