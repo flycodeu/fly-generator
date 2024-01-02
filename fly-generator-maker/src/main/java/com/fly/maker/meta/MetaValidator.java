@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
+import com.fly.maker.meta.enums.FileGenerateTypeEnum;
+import com.fly.maker.meta.enums.FileTypeEnum;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -101,19 +103,18 @@ public class MetaValidator {
             if (StrUtil.isBlank(fileInfoType)) {
                 // 无后缀是目录
                 if (StrUtil.isBlank(FileUtil.getSuffix(inputPath))) {
-                    fileInfo.setType("dir");
+                    fileInfo.setType(FileTypeEnum.DIR.getValue());
                 } else {
-                    fileInfo.setType("file");
+                    fileInfo.setType(FileTypeEnum.DIR.getValue());
                 }
             }
             //generateType文件结尾不为ftl就是static否则dynamic
             if (StrUtil.isBlank(generateType)) {
                 if (inputPath.endsWith(".ftl")) {
-                    fileInfo.setGenerateType("dynamic");
+                    fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
+                } else {
+                    fileInfo.setGenerateType(FileGenerateTypeEnum.STATIC.getValue());
                 }
-                fileInfo.setGenerateType("dynamic");
-            } else {
-                fileInfo.setGenerateType("static");
             }
         }
     }
