@@ -6,6 +6,17 @@ import freemarker.template.TemplateException;
 import java.io.File;
 import java.io.IOException;
 
+<#macro generateFile indent fileInfo>
+${indent}inputPath = new File(inputRootPath, "${fileInfo.inputPath}").getAbsolutePath();
+${indent}outputPath = new File(outputRootPath, "${fileInfo.outputPath}").getAbsolutePath();
+    <#if fileInfo.generateType == "dynamic">
+        // 动态文件生成
+${indent}DynamicGenerator.doGenerate(inputPath, outputPath, object);
+    <#else>
+        // 静态文件生成
+${indent}StaticGenerator.copyFilesByHutool(inputPath, outputPath);
+    </#if>
+</#macro>
 
 /**
 * 核心代码生成器
@@ -35,55 +46,24 @@ public class MainGenerator {
       <#if fileInfo.condition??>
         if(${fileInfo.condition}){
         <#list fileInfo.files as fileInfo>
-            inputPath = new File(inputRootPath, "${fileInfo.inputPath}").getAbsolutePath();
-            outputPath = new File(outputRootPath, "${fileInfo.outputPath}").getAbsolutePath();
-            <#if fileInfo.generateType == "dynamic">
-            // 动态文件生成
-            DynamicGenerator.doGenerate(inputPath, outputPath, object);
-            <#else>
-            // 静态文件生成
-            StaticGenerator.copyFilesByHutool(inputPath, outputPath);
-            </#if>
+            <@generateFile fileInfo=fileInfo indent="            "/>
         </#list>
         }
         <#else>
          <#list fileInfo.files as fileInfo>
-             inputPath = new File(inputRootPath, "${fileInfo.inputPath}").getAbsolutePath();
-             outputPath = new File(outputRootPath, "${fileInfo.outputPath}").getAbsolutePath();
-             <#if fileInfo.generateType == "dynamic">
-             // 动态文件生成
-             DynamicGenerator.doGenerate(inputPath, outputPath, object);
-             <#else>
-             // 静态文件生成
-             StaticGenerator.copyFilesByHutool(inputPath, outputPath);
-             </#if>
+             <@generateFile fileInfo=fileInfo indent="        "/>
          </#list>
         </#if>
     <#else>
 <#if fileInfo.condition??>
     if(${fileInfo.condition}){
-        inputPath = new File(inputRootPath, "${fileInfo.inputPath}").getAbsolutePath();
-        outputPath = new File(outputRootPath, "${fileInfo.outputPath}").getAbsolutePath();
-    <#if fileInfo.generateType == "dynamic">
-        // 动态文件生成
-        DynamicGenerator.doGenerate(inputPath, outputPath, object);
-    <#else>
-        // 静态文件生成
-        StaticGenerator.copyFilesByHutool(inputPath, outputPath);
-    </#if>
+    <@generateFile fileInfo=fileInfo indent="        "/>
         }
     <#else>
-        inputPath = new File(inputRootPath, "${fileInfo.inputPath}").getAbsolutePath();
-        outputPath = new File(outputRootPath, "${fileInfo.outputPath}").getAbsolutePath();
-    <#if fileInfo.generateType == "dynamic">
-        // 动态文件生成
-        DynamicGenerator.doGenerate(inputPath, outputPath, object);
-    <#else>
-        // 静态文件生成
-         StaticGenerator.copyFilesByHutool(inputPath, outputPath);
-            </#if>
-        </#if>
-    </#if>
+    <@generateFile fileInfo=fileInfo indent="        "/>
+</#if>
+
+</#if>
 </#list>
     }
 }
