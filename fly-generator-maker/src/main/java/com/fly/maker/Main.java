@@ -1,13 +1,14 @@
 package com.fly.maker;
 
 
+import com.fly.maker.generator.main.MainGenerator;
+import freemarker.template.TemplateException;
+
+import java.io.IOException;
+
 public class Main {
-
-
-    public static void main(String[] args) {
-        //args = new String[]{"generate","-l","-o","-a"}; // 示例参数
-        //args = new String[]{"list"}; // 示例参数
-//        CommandExecutor commandExecutor = new CommandExecutor();
-//        commandExecutor.doExecute(args);
+    public static void main(String[] args) throws TemplateException, IOException, InterruptedException {
+        MainGenerator mainGenerator = new MainGenerator();
+        mainGenerator.doGenerate();
     }
 }
