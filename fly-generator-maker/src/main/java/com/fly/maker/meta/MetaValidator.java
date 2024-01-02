@@ -46,6 +46,9 @@ public class MetaValidator {
             if (StrUtil.isBlank(fieldName)) {
                 throw new MetaException("未填写filedName");
             }
+            if (modelInfo.getAbbr()== null){
+                modelInfo.setAbbr(fieldName);
+            }
         }
     }
 
