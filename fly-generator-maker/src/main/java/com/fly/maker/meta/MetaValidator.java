@@ -39,6 +39,12 @@ public class MetaValidator {
             return;
         }
         for (Meta.ModelConfig.ModelInfo modelInfo : models) {
+            // group分组就不需要校验
+            String groupKey = modelInfo.getGroupKey();
+            if (StrUtil.isNotEmpty(groupKey)){
+                continue;
+            }
+
             // 必填
             String fieldName = modelInfo.getFieldName();
             String modelInfoType = StrUtil.blankToDefault(modelInfo.getType(), ModelTypeEnum.STRING.getValue());

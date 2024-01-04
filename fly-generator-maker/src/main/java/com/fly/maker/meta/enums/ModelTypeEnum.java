@@ -6,7 +6,6 @@ package com.fly.maker.meta.enums;
 public enum ModelTypeEnum {
     STRING("字符串", "String"),
     BOOLEAN("布尔", "boolean");
-
     private String text;
 
     private String value;
