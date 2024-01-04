@@ -137,6 +137,12 @@ public abstract class GenerateTemplate {
         //System.out.println(outputFilePath);
         DynamicFileGenerator.doGenerate(inputFilePath, outputFilePath, meta);
 
+        // 生成MainGenerator
+        inputFilePath = inputResourcePath + "templates/java/generator/MainGenerator.java.ftl";
+        outputFilePath = outputBaseJavaPackagePath + File.separator + "generator" + File.separator + "MainGenerator.java";
+        //System.out.println(outputFilePath);
+        DynamicFileGenerator.doGenerate(inputFilePath, outputFilePath, meta);
+
         // 生成cli包下面对应的文件
         // 生成cli.command.ConfigCommand
         inputFilePath = inputResourcePath + "templates/java/cli/command/ConfigCommand.java.ftl";
@@ -168,11 +174,7 @@ public abstract class GenerateTemplate {
         //System.out.println(outputFilePath);
         DynamicFileGenerator.doGenerate(inputFilePath, outputFilePath, meta);
 
-        // 生成MainGenerator
-        inputFilePath = inputResourcePath + "templates/java/generator/MainGenerator.java.ftl";
-        outputFilePath = outputBaseJavaPackagePath + File.separator + "generator" + File.separator + "MainGenerator.java";
-        //System.out.println(outputFilePath);
-        DynamicFileGenerator.doGenerate(inputFilePath, outputFilePath, meta);
+
 
         // 生成StaticFileGenerator
         inputFilePath = inputResourcePath + "templates/java/generator/StaticGenerator.java.ftl";
