@@ -19,21 +19,40 @@ generator <命令> <选项参数>
 示例命令：
 
 ```
-generator generate <#list modelConfig.models as modelInfo>-${modelInfo.abbr} </#list>
+generator generate <#list modelConfig.models as modelInfo><#if modelInfo.groupKey??><#list modelInfo.models as subModelInfo><#if subModelInfo.abbr??> -${subModelInfo.abbr} <#else> -${subModelInfo.fieldName} </#if></#list><#else><#if modelInfo.abbr??> -${modelInfo.abbr} <#else> -${modelInfo.fieldName} </#if></#if></#list>
 ```
 
 ## 参数说明
 
 <#list modelConfig.models as modelInfo>
-${modelInfo?index + 1}）${modelInfo.fieldName}
 
-类型：${modelInfo.type}
+<#if  modelInfo.groupKey??>
 
-描述：${modelInfo.description}
+分组标签: ${modelInfo.groupKey}
+分组条件: ${modelInfo.condition}
+    <#list modelInfo.models as submodelInfo>
 
-默认值：${modelInfo.defaultValue?c}
+字段名：${submodelInfo.fieldName}
 
-缩写： -${modelInfo.abbr}
+> 类型：${submodelInfo.type}
 
+> 描述：${submodelInfo.description}
+
+> 默认值：${submodelInfo.defaultValue?c}
+
+> 缩写： <#if submodelInfo.abbr??>-${submodelInfo.abbr}<#else>无</#if>
+</#list>
+<#else>
+
+字段名：${modelInfo.fieldName}
+
+> 类型：${modelInfo.type}
+
+> 描述：${modelInfo.description}
+
+> 默认值： ${modelInfo.defaultValue?c}
+
+> 缩写：  <#if modelInfo.abbr??>${modelInfo.abbr}<#else>无</#if>
+</#if>
 
 </#list>
