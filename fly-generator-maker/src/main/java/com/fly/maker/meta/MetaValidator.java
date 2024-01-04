@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 元信息校验
@@ -41,7 +42,11 @@ public class MetaValidator {
         for (Meta.ModelConfig.ModelInfo modelInfo : models) {
             // group分组就不需要校验
             String groupKey = modelInfo.getGroupKey();
-            if (StrUtil.isNotEmpty(groupKey)){
+            if (StrUtil.isNotEmpty(groupKey)) {
+                // 目标中间参数"--author","--outputText"
+                List<Meta.ModelConfig.ModelInfo> subModelInfoList = modelInfo.getModels();
+                String allArgsStr = subModelInfoList.stream().map(subModelInfo -> String.format("\"--%s\"", subModelInfo.getFieldName())).collect(Collectors.joining(", "));
+                modelInfo.setAllArgsStr(allArgsStr);
                 continue;
             }
 
@@ -53,7 +58,7 @@ public class MetaValidator {
             if (StrUtil.isBlank(fieldName)) {
                 throw new MetaException("未填写filedName");
             }
-            if (modelInfo.getAbbr()== null){
+            if (modelInfo.getAbbr() == null) {
                 modelInfo.setAbbr(fieldName);
             }
         }
@@ -104,7 +109,7 @@ public class MetaValidator {
             String generateType = fileInfo.getGenerateType();
 
             // 如果是分组就不需要校验
-            if (Objects.equals(fileInfoType, FileTypeEnum.GROUP.getValue())){
+            if (Objects.equals(fileInfoType, FileTypeEnum.GROUP.getValue())) {
                 continue;
             }
 
