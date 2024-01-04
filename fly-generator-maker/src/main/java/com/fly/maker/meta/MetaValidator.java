@@ -45,7 +45,9 @@ public class MetaValidator {
             if (StrUtil.isNotEmpty(groupKey)) {
                 // 目标中间参数"--author","--outputText"
                 List<Meta.ModelConfig.ModelInfo> subModelInfoList = modelInfo.getModels();
-                String allArgsStr = subModelInfoList.stream().map(subModelInfo -> String.format("\"--%s\"", subModelInfo.getFieldName())).collect(Collectors.joining(", "));
+                String allArgsStr = subModelInfoList.stream().map(subModelInfo -> {
+                    return String.format("\"--%s\"", subModelInfo.getFieldName());
+                }).collect(Collectors.joining(", "));
                 modelInfo.setAllArgsStr(allArgsStr);
                 continue;
             }
