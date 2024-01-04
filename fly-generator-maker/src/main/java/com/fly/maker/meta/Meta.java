@@ -60,6 +60,10 @@ public class Meta {
             private String groupKey;
             private String groupName;
             private List<ModelInfo> models;
+
+            // 中间参数
+            // 该分组下所有参数字符串拼接
+            private String allArgsStr;
         }
     }
 }
