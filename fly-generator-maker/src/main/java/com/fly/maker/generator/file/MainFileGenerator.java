@@ -1,6 +1,6 @@
 package com.fly.maker.generator.file;
 
-import com.fly.maker.model.DataModel;
+
 import freemarker.template.TemplateException;
 
 import java.io.File;
@@ -12,7 +12,7 @@ import java.io.IOException;
  */
 public class MainFileGenerator {
 
-    public static void doGenerate(DataModel dataModel) throws IOException, TemplateException {
+    public static void doGenerate(Object dataModel) throws IOException, TemplateException {
         // 静态生成
         //  获取项目路径
         String projectPath = System.getProperty("user.dir");
