@@ -1,5 +1,7 @@
 package com.fly.maker.model;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
@@ -16,7 +18,18 @@ import java.util.stream.Collectors;
 
 public class TemplateMaker {
 
-    private static long makeTemplate(Long id) {
+    /**
+     * 制作模板
+     *
+     * @param newMeta           新的元信息
+     * @param originProjectPath 项目原始路径
+     * @param inputFilePath     输入文件的路径
+     * @param modelInfo         数据模型
+     * @param searchStr         替换参数
+     * @param id                旧项目id
+     * @return id
+     */
+    private static long makeTemplate(Meta newMeta, String originProjectPath, String inputFilePath, Meta.ModelConfig.ModelInfo modelInfo, String searchStr, Long id) {
         // 没有id就生成
         if (id == null) {
             id = IdUtil.getSnowflakeNextId();
@@ -24,11 +37,10 @@ public class TemplateMaker {
         // 有id，写业务
         // 工作区间
         // 原始路径
-        String projectPath = System.getProperty("user.dir");
         // 2.2 文件父级路径
-        String originProjectPath = new File(projectPath).getParent() + File.separator + "fly-generator-demo-projects/acm-template";
         // 复制目录
         // 雪花算法id
+        String projectPath = System.getProperty("user.dir");
         String tempDirPath = projectPath + File.separator + ".temp";
         String tempFilePath = tempDirPath + File.separator + id;
         if (!FileUtil.exist(tempFilePath)) {
@@ -38,8 +50,6 @@ public class TemplateMaker {
 
         // 一、项目模板基本信息
         // 1. 基础配置信息
-        String name = "acm-template-generator";
-        String description = "ACM 示例模板生成器";
         // 2. 文件信息
         // 2.1 文件路径
         //String projectPath = System.getProperty("user.dir");
@@ -47,16 +57,11 @@ public class TemplateMaker {
         String sourceRootPath = tempFilePath + File.separator + FileUtil.getLastPathEle(Paths.get(originProjectPath)).toString();
         sourceRootPath = sourceRootPath.replaceAll("\\\\", "/");
         // 2.3 找到对应文件位置路径
-        String fileInputPath = "/src/com/yupi/acm/MainTemplate.java";
+        String fileInputPath = inputFilePath;
         // 2.4 输出.ftl文件路径
         String fileOutputPath = fileInputPath + ".ftl";
 
         // 3. 数据模型信息
-        Meta.ModelConfig.ModelInfo modelInfo = new Meta.ModelConfig.ModelInfo();
-        modelInfo.setFieldName("outputText");
-        modelInfo.setType("String");
-        modelInfo.setDefaultValue("sum=");
-
         // 4. 生成ftl文件
         // 4.1 获取文件内容信息
         String fileInputAbsolutePath = sourceRootPath + File.separator + fileInputPath;
@@ -72,63 +77,55 @@ public class TemplateMaker {
 
         // 4.2 替换文件信息
         String replacement = String.format("${%s}", modelInfo.getFieldName());
-        String newFileContent = StrUtil.replace(fileContent, "Sum:", replacement);
+        String newFileContent = StrUtil.replace(fileContent, searchStr, replacement);
         // 4.3 生成ftl文件
         FileUtil.writeUtf8String(newFileContent, fileOutputAbsolutePath);
 
-
         // 二、生成Meta元信息
-
-        String metaOutputPath = sourceRootPath + File.separator + "meta.json";
-
-        // 因为只有一个文件，所以提出来共用
         Meta.FileConfig.FileInfo fileInfo = new Meta.FileConfig.FileInfo();
         fileInfo.setInputPath(fileInputPath);
         fileInfo.setOutputPath(fileOutputPath);
         fileInfo.setType(FileTypeEnum.FILE.getValue());
         fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
 
+        String metaOutputPath = sourceRootPath + File.separator + "meta.json";
+
         // meta文件存在，使用旧的
         if (FileUtil.exist(metaOutputPath)) {
-            Meta oldMeta = JSONUtil.toBean(FileUtil.readUtf8String(metaOutputPath), Meta.class, true);
+            Meta oldMeta = JSONUtil.toBean(FileUtil.readUtf8String(metaOutputPath), Meta.class, false);
+            // 将旧的meta的值写入到新的meta里面
+            BeanUtil.copyProperties(newMeta, oldMeta, CopyOptions.create().ignoreNullValue());
+            newMeta = oldMeta;
             // 追加配置
-            List<Meta.FileConfig.FileInfo> oldFileInfoList = oldMeta.getFileConfig().getFiles();
-            oldFileInfoList.add(fileInfo);
+            List<Meta.FileConfig.FileInfo> fileInfoList = newMeta.getFileConfig().getFiles();
+            fileInfoList.add(fileInfo);
 
-            List<Meta.ModelConfig.ModelInfo> oldModelInfoList = oldMeta.getModelConfig().getModels();
-            oldModelInfoList.add(modelInfo);
+            List<Meta.ModelConfig.ModelInfo> modelInfoList = newMeta.getModelConfig().getModels();
+            modelInfoList.add(modelInfo);
             // 配置去重
-            oldMeta.getFileConfig().setFiles(distinctFiles(oldFileInfoList));
-            oldMeta.getModelConfig().setModels(distinctModels(oldModelInfoList));
-
-            // 更新meta信息
-            FileUtil.writeUtf8String(JSONUtil.toJsonPrettyStr(oldMeta), metaOutputPath);
+            newMeta.getFileConfig().setFiles(distinctFiles(fileInfoList));
+            newMeta.getModelConfig().setModels(distinctModels(modelInfoList));
         } else {
             // meta文件不存在，创建
-            Meta meta = new Meta();
-            // 1. 基础配置信息
-            meta.setName(name);
-            meta.setDescription(description);
-
+            // 1. 基础配置信息提取出去
             // 2. 文件配置信息
             Meta.FileConfig fileConfig = new Meta.FileConfig();
-            meta.setFileConfig(fileConfig);
+            newMeta.setFileConfig(fileConfig);
             fileConfig.setSourceRootPath(sourceRootPath);
             List<Meta.FileConfig.FileInfo> fileInfoList = new ArrayList<>();
             fileConfig.setFiles(fileInfoList);
-
             fileInfoList.add(fileInfo);
 
             // 3. 模型配置信息
             List<Meta.ModelConfig.ModelInfo> modelInfoList = new ArrayList<>();
             Meta.ModelConfig modelConfig = new Meta.ModelConfig();
-            meta.setModelConfig(modelConfig);
-            modelInfoList.add(modelInfo);
+            newMeta.setModelConfig(modelConfig);
             modelConfig.setModels(modelInfoList);
+            modelInfoList.add(modelInfo);
 
-            // 4. 生成meta文件
-            FileUtil.writeUtf8String(JSONUtil.toJsonPrettyStr(meta), metaOutputPath);
         }
+        // 4. 生成meta文件
+        FileUtil.writeUtf8String(JSONUtil.toJsonPrettyStr(newMeta), metaOutputPath);
         return id;
     }
 
@@ -139,28 +136,53 @@ public class TemplateMaker {
      * @return
      */
     private static List<Meta.FileConfig.FileInfo> distinctFiles(List<Meta.FileConfig.FileInfo> fileInfoList) {
-        ArrayList<Meta.FileConfig.FileInfo> newFileInfoList = new ArrayList<>(fileInfoList.stream()
-                .collect(Collectors
-                        .toMap(Meta.FileConfig.FileInfo::getInputPath, o -> o, ((exist, replace) -> replace))).values());
-
+        List<Meta.FileConfig.FileInfo> newFileInfoList = new ArrayList<>(
+                fileInfoList.stream()
+                        .collect(
+                                Collectors.toMap(Meta.FileConfig.FileInfo::getInputPath, o -> o, (e, r) -> r)
+                        ).values()
+        );
         return newFileInfoList;
     }
 
     /**
-     * 数据模型去重
+     * 模型去重
      *
      * @param modelInfoList
      * @return
      */
     private static List<Meta.ModelConfig.ModelInfo> distinctModels(List<Meta.ModelConfig.ModelInfo> modelInfoList) {
-        ArrayList<Meta.ModelConfig.ModelInfo> newModelInfoList = new ArrayList<>(modelInfoList.stream()
-                .collect(Collectors
-                        .toMap(Meta.ModelConfig.ModelInfo::getFieldName, o -> o, ((exist, replace) -> replace))).values());
-
+        List<Meta.ModelConfig.ModelInfo> newModelInfoList = new ArrayList<>(
+                modelInfoList.stream()
+                        .collect(
+                                Collectors.toMap(Meta.ModelConfig.ModelInfo::getFieldName, o -> o, (e, r) -> r)
+                        ).values()
+        );
         return newModelInfoList;
     }
 
+
     public static void main(String[] args) {
-        makeTemplate(1743108401603608576L);
+        Meta meta = new Meta();
+        meta.setName("acm-template-generator");
+        meta.setDescription("ACM 示例模板生成器");
+        String projectPath = System.getProperty("user.dir");
+        String originProjectPath = new File(projectPath).getParent() + File.separator + "fly-generator-demo-projects/acm-template";
+        String inputFilePath = "src/com/yupi/acm/MainTemplate.java";
+
+//        Meta.ModelConfig.ModelInfo modelInfo = new Meta.ModelConfig.ModelInfo();
+//        modelInfo.setFieldName("outputText");
+//        modelInfo.setType("String");
+//        modelInfo.setDefaultValue("sum=");
+
+        Meta.ModelConfig.ModelInfo modelInfo = new Meta.ModelConfig.ModelInfo();
+        modelInfo.setFieldName("author");
+        modelInfo.setType("String");
+        modelInfo.setDefaultValue("fly");
+
+
+        //String searchStr = "Sum:";
+        String searchStr = "@author";
+        makeTemplate(meta, originProjectPath, inputFilePath, modelInfo, searchStr, 1L);
     }
 }
