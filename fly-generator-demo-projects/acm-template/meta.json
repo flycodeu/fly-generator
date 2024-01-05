@@ -15,9 +15,11 @@
     "modelConfig": {
         "models": [
             {
-                "fieldName": "outputText",
+                "fieldName": "author",
                 "type": "String",
-                "defaultValue": "sum="
+                "defaultValue": "fly"
+            },
+            {
             }
         ]
     }

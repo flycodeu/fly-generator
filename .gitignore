@@ -3,7 +3,7 @@
 fly-generator.iml
 fly-generator-demo-projects.iml
 generated
-
+.temp
 ### Java template
 # Compiled class file
 *.class

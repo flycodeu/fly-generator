@@ -1,6 +1,7 @@
 package com.fly.maker.model;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.fly.maker.meta.Meta;
@@ -8,22 +9,39 @@ import com.fly.maker.meta.enums.FileGenerateTypeEnum;
 import com.fly.maker.meta.enums.FileTypeEnum;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TemplateMaker {
 
     public static void main(String[] args) {
+        // 工作区间
+        // 原始路径
+        String projectPath = System.getProperty("user.dir");
+        // 2.2 文件父级路径
+        String originProjectPath = new File(projectPath).getParent() + File.separator + "fly-generator-demo-projects/acm-template";
+        // 复制目录
+        // 雪花算法id
+        long id = IdUtil.getSnowflakeNextId();
+        String tempDirPath = projectPath +File.separator+ ".temp";
+        String tempFilePath = tempDirPath + File.separator + id;
+        if (!FileUtil.exist(tempFilePath)) {
+            FileUtil.mkdir(tempFilePath);
+        }
+        FileUtil.copy(originProjectPath, tempFilePath, true);
+
+
         // 一、项目模板基本信息
         // 1. 基础配置信息
         String name = "acm-template-generator";
         String description = "ACM 示例模板生成器";
         // 2. 文件信息
         // 2.1 文件路径
-        String projectPath = System.getProperty("user.dir");
+        //String projectPath = System.getProperty("user.dir");
         // 2.2 文件父级路径
-        String sourceRootPath = new File(projectPath).getParent() + File.separator + "fly-generator-demo-projects/acm-template";
-        sourceRootPath=sourceRootPath.replaceAll("\\\\","/");
+        String sourceRootPath = tempFilePath + File.separator + FileUtil.getLastPathEle(Paths.get(originProjectPath)).toString();
+        sourceRootPath = sourceRootPath.replaceAll("\\\\", "/");
         // 2.3 找到对应文件位置路径
         String fileInputPath = "/src/com/yupi/acm/MainTemplate.java";
         // 2.4 输出.ftl文件路径
