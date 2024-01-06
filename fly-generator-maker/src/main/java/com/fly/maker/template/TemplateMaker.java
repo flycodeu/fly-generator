@@ -2,6 +2,7 @@ package com.fly.maker.template;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
@@ -17,9 +18,7 @@ import com.fly.maker.template.model.TemplateMakerFileConfig;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TemplateMaker {
@@ -63,6 +62,7 @@ public class TemplateMaker {
         // 使用文件的绝对路径来处理对应的文件读取
         List<Meta.FileConfig.FileInfo> newFileInfoList = new ArrayList<>();
         List<TemplateMakerFileConfig.FileInfoConfig> fileInfoConfigList = templateMakerFileConfig.getFiles();
+        // 过滤文件
         for (TemplateMakerFileConfig.FileInfoConfig fileInfoConfig : fileInfoConfigList) {
             String inputFilePath = fileInfoConfig.getPath();
             // 输入文件绝对路径
@@ -73,6 +73,25 @@ public class TemplateMaker {
                 Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(file, modelInfo, searchStr, sourceRootPath);
                 newFileInfoList.add(fileInfo);
             }
+        }
+
+        // 文件分组
+        TemplateMakerFileConfig.FileGroupConfig fileGroupConfig = templateMakerFileConfig.getFileGroupConfig();
+        if (fileGroupConfig != null) {
+            String condition = fileGroupConfig.getCondition();
+            String groupKey = fileGroupConfig.getGroupKey();
+            String groupName = fileGroupConfig.getGroupName();
+
+            // 设置文件分组信息
+            Meta.FileConfig.FileInfo groupFileInfo = new Meta.FileConfig.FileInfo();
+            groupFileInfo.setType(FileTypeEnum.GROUP.getValue());
+            groupFileInfo.setCondition(condition);
+            groupFileInfo.setGroupKey(groupKey);
+            groupFileInfo.setGroupName(groupName);
+            // 文件全部放到分组里面
+            groupFileInfo.setFiles(newFileInfoList);
+            newFileInfoList = new ArrayList<>();
+            newFileInfoList.add(groupFileInfo);
         }
 
 
@@ -178,13 +197,47 @@ public class TemplateMaker {
      * @return
      */
     private static List<Meta.FileConfig.FileInfo> distinctFiles(List<Meta.FileConfig.FileInfo> fileInfoList) {
-        List<Meta.FileConfig.FileInfo> newFileInfoList = new ArrayList<>(
-                fileInfoList.stream()
+        //1. 将所有文件配置（fileInfo）分为有分组的和无分组的
+        // 有分组的以组来划分,key是groupKey,value是FileInfo列表
+        // 示例 {"groupKey":"a","files":[1,2]}  {"groupKey":"a","files":[2,3]}   {"groupKey":"b","files":[4,5]}
+        Map<String, List<Meta.FileConfig.FileInfo>> groupKeyFileInfoListMap = fileInfoList.stream()
+                .filter(fileInfo -> StrUtil.isNotBlank(fileInfo.getGroupKey()))
+                .collect(Collectors.groupingBy(Meta.FileConfig.FileInfo::getGroupKey));
+
+        //2. 对于有分组的文件配置，如果有相同的分组，同分组内的文件进行合并（merge），不同分组可同时保留
+        //  {"groupKey":"a","files":[1,2]}  {"groupKey":"a","files":[2,3]}
+        //  先变成 {"groupKey":"a","files":[[1,2],[2,3]}
+        //  flatMap展开 {"groupKey":"a","files":[1,2,2,3}
+        //  合并后 {"groupKey":"a","files":[1,2,3]}
+        // 保存每个组对应的合并后的对象 map
+        Map<String, Meta.FileConfig.FileInfo> groupKeyMergedFileInfoMap = new HashMap<>();
+        for (Map.Entry<String, List<Meta.FileConfig.FileInfo>> entry : groupKeyFileInfoListMap.entrySet()) {
+            List<Meta.FileConfig.FileInfo> tempFileList = entry.getValue();
+            String groupKey = entry.getKey();
+            ArrayList<Meta.FileConfig.FileInfo> newFileInfoList = new ArrayList<>(tempFileList.stream()
+                    .flatMap(fileInfo -> fileInfo.getFiles().stream())
+                    .collect(Collectors
+                            .toMap(Meta.FileConfig.FileInfo::getInputPath, o -> o, (e, r) -> r)).values());
+
+            // 因为之前是将新的代码添加到旧的代码的下面，所以覆盖的时候只需要获取最新的就可以
+            Meta.FileConfig.FileInfo newFileInfo = CollUtil.getLast(tempFileList);
+            newFileInfo.setFiles(newFileInfoList);
+            groupKeyMergedFileInfoMap.put(groupKey, newFileInfo);
+        }
+
+        //3. 创建新的文件配置列表（结果列表），先将合并后的分组添加到结果列表,现在是单个文件
+        ArrayList<Meta.FileConfig.FileInfo> resultList = new ArrayList<>(groupKeyMergedFileInfoMap.values());
+
+        //4. 再将无分组的文件配置列表添加到结果列表
+        List<Meta.FileConfig.FileInfo> noGroupKeyFileList = fileInfoList.stream().filter(fileInfo -> StrUtil.isBlank(fileInfo.getGroupKey()))
+                .collect(Collectors.toList());
+
+        resultList.addAll(new ArrayList<>(
+                noGroupKeyFileList.stream()
                         .collect(
                                 Collectors.toMap(Meta.FileConfig.FileInfo::getInputPath, o -> o, (e, r) -> r)
-                        ).values()
-        );
-        return newFileInfoList;
+                        ).values()));
+        return resultList;
     }
 
     /**
@@ -215,7 +268,7 @@ public class TemplateMaker {
 
         String inputFilePath1 = "/src/main/java/com/yupi/springbootinit/common/";
 
-        String inputFilePath2 = "/src/main/java/com/yupi/springbootinit/controller/";
+        String inputFilePath2 = "/src/main/java/com/yupi/springbootinit/constant/";
         inputFilePathList.add(inputFilePath1);
         inputFilePathList.add(inputFilePath2);
 //        Meta.ModelConfig.ModelInfo modelInfo = new Meta.ModelConfig.ModelInfo();
@@ -253,7 +306,14 @@ public class TemplateMaker {
         TemplateMakerFileConfig templateMakerFileConfig = new TemplateMakerFileConfig();
         templateMakerFileConfig.setFiles(Arrays.asList(fileInfoConfig1, fileInfoConfig2));
 
-        long l = makeTemplate(meta, originProjectPath, templateMakerFileConfig, modelInfo, searchStr, null);
+
+        TemplateMakerFileConfig.FileGroupConfig fileGroupConfig = new TemplateMakerFileConfig.FileGroupConfig();
+        fileGroupConfig.setCondition("test");
+        fileGroupConfig.setGroupKey("test2");
+        fileGroupConfig.setGroupName("test");
+        templateMakerFileConfig.setFileGroupConfig(fileGroupConfig);
+
+        long l = makeTemplate(meta, originProjectPath, templateMakerFileConfig, modelInfo, searchStr, 1743535896794611712L);
         System.out.println(l);
     }
 }
