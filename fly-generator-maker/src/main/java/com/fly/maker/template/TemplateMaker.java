@@ -219,9 +219,9 @@ public class TemplateMaker {
 
         // 二、生成Meta元信息
         Meta.FileConfig.FileInfo fileInfo = new Meta.FileConfig.FileInfo();
-        fileInfo.setInputPath(fileInputPath);
+        fileInfo.setInputPath(fileOutputPath);
         fileInfo.setType(FileTypeEnum.FILE.getValue());
-        fileInfo.setOutputPath(fileOutputPath);
+        fileInfo.setOutputPath(fileInputPath);
         fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
 
         // 判断新的文件内容和之前的文件内容是否相同
@@ -230,7 +230,7 @@ public class TemplateMaker {
         if (!hasTemplateFile) {
             if (contentEquals) {
                 // 静态文件，不需要生成,路径和原来输入路径一样
-                fileInfo.setOutputPath(fileInputPath);
+                fileInfo.setInputPath(fileInputPath);
                 fileInfo.setGenerateType(FileGenerateTypeEnum.STATIC.getValue());
             } else {
                 // 4.3 生成ftl文件
@@ -240,7 +240,6 @@ public class TemplateMaker {
             // 之前存在模板并且内容不同
             FileUtil.writeUtf8String(newFileContent, fileOutputAbsolutePath);
         }
-
 
         return fileInfo;
     }
@@ -272,7 +271,7 @@ public class TemplateMaker {
             ArrayList<Meta.FileConfig.FileInfo> newFileInfoList = new ArrayList<>(tempFileList.stream()
                     .flatMap(fileInfo -> fileInfo.getFiles().stream())
                     .collect(Collectors
-                            .toMap(Meta.FileConfig.FileInfo::getInputPath, o -> o, (e, r) -> r)).values());
+                            .toMap(Meta.FileConfig.FileInfo::getOutputPath, o -> o, (e, r) -> r)).values());
 
             // 因为之前是将新的代码添加到旧的代码的下面，所以覆盖的时候只需要获取最新的就可以
             Meta.FileConfig.FileInfo newFileInfo = CollUtil.getLast(tempFileList);
@@ -290,7 +289,7 @@ public class TemplateMaker {
         resultList.addAll(new ArrayList<>(
                 noGroupKeyFileList.stream()
                         .collect(
-                                Collectors.toMap(Meta.FileConfig.FileInfo::getInputPath, o -> o, (e, r) -> r)
+                                Collectors.toMap(Meta.FileConfig.FileInfo::getOutputPath, o -> o, (e, r) -> r)
                         ).values()));
         return resultList;
     }
