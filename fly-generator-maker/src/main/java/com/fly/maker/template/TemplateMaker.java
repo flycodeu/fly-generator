@@ -130,7 +130,7 @@ public class TemplateMaker {
 
 
         // meta生成路径
-        String metaOutputPath = sourceRootPath + File.separator + "meta.json";
+        String metaOutputPath = tempFilePath + File.separator + "meta.json";
 
         // meta文件存在，使用旧的
         if (FileUtil.exist(metaOutputPath)) {
@@ -214,7 +214,6 @@ public class TemplateMaker {
             }
             // 多次替换信息
             newFileContent = StrUtil.replace(newFileContent, modelInfoConfig.getReplaceText(), replacement);
-
         }
 
         // 二、生成Meta元信息

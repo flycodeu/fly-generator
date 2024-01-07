@@ -61,7 +61,7 @@ public class TemplateMakerTest {
         String projectPath = System.getProperty("user.dir");
         String originProjectPath = new File(projectPath).getParent() + File.separator + "fly-generator-demo-projects/springboot-init";
 
-        String inputFilePath1 = "/src/main/java/com/yupi/springbootinit/common";
+        String inputFilePath1 = "./";
 
         List<FileFilterConfig> fileFilterConfigList = new ArrayList<>();
         // 文件过滤配置
