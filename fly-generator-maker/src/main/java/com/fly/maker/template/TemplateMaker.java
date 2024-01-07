@@ -73,7 +73,20 @@ public class TemplateMaker {
         // 一、项目模板基本信息
         // 1. 基础配置信息
         // 2. 文件信息
-        String sourceRootPath = tempFilePath + File.separator + FileUtil.getLastPathEle(Paths.get(originProjectPath)).toString();
+        // 只需要获取到第一个目录的信息就可以，不需要继续往下遍历其余子文件
+        String sourceRootPath = FileUtil
+                // 最大遍历深度为1
+                .loopFiles(new File(tempFilePath), 1, null)
+                .stream()
+                // 过滤掉不是目录的文件
+                .filter(File::isDirectory)
+                // 找到第一个目录
+                .findFirst()
+                // 这里可能会报错，因为上面过滤后的结果可能为空
+                .orElseThrow(() -> new RuntimeException("没有找到项目根目录"))
+                // 获取绝对路径
+                .getAbsolutePath();
+
         sourceRootPath = sourceRootPath.replaceAll("\\\\", "/");
 
         // 数据模型分组
