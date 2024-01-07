@@ -34,7 +34,7 @@ public class TemplateMaker {
      * @param id                       旧项目id
      * @return id
      */
-    private static long makeTemplate(Meta newMeta, String originProjectPath, TemplateMakerFileConfig templateMakerFileConfig, TemplateMakerModelConfig templateMakerModelConfig, Long id) {
+    public static long makeTemplate(Meta newMeta, String originProjectPath, TemplateMakerFileConfig templateMakerFileConfig, TemplateMakerModelConfig templateMakerModelConfig, Long id) {
         // 没有id就生成
         if (id == null) {
             id = IdUtil.getSnowflakeNextId();
@@ -101,6 +101,8 @@ public class TemplateMaker {
             String inputFileAbsolutePath = sourceRootPath + File.separator + inputFilePath;
             // 得到过滤后的文件列表
             List<File> fileList = FileFilter.doFilter(inputFileAbsolutePath, fileInfoConfig.getFileFilterConfigs());
+            // 过滤掉ftl文件
+            fileList = fileList.stream().filter(file -> !file.getAbsolutePath().endsWith(".ftl")).collect(Collectors.toList());
             for (File file : fileList) {
                 Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(file, templateMakerModelConfig, sourceRootPath);
                 newFileInfoList.add(fileInfo);
@@ -225,7 +227,7 @@ public class TemplateMaker {
         // 判断新的文件内容和之前的文件内容是否相同
         // 之前不存在模板，没有更改文件内容，就是静态的
         boolean contentEquals = fileContent.equals(newFileContent);
-        if(!hasTemplateFile){
+        if (!hasTemplateFile) {
             if (contentEquals) {
                 // 静态文件，不需要生成,路径和原来输入路径一样
                 fileInfo.setOutputPath(fileInputPath);
@@ -234,7 +236,7 @@ public class TemplateMaker {
                 // 4.3 生成ftl文件
                 FileUtil.writeUtf8String(newFileContent, fileOutputAbsolutePath);
             }
-        }else if (contentEquals){
+        } else if (contentEquals) {
             // 之前存在模板并且内容不同
             FileUtil.writeUtf8String(newFileContent, fileOutputAbsolutePath);
         }
