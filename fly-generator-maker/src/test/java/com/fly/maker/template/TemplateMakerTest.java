@@ -52,7 +52,7 @@ public class TemplateMakerTest {
         List<TemplateMakerModelConfig.ModelInfoConfig> modelInfoConfigList = Arrays.asList(modelInfoConfig1);
         templateMakerModelConfig.setModels(modelInfoConfigList);
 
-        long l = TemplateMaker.makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, 1743817327068332032L);
+        long l = TemplateMaker.makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, null, 1743817327068332032L);
         System.out.println(l);
     }
 
@@ -84,7 +84,7 @@ public class TemplateMakerTest {
         List<TemplateMakerModelConfig.ModelInfoConfig> modelInfoConfigList = Arrays.asList(modelInfoConfig1);
         templateMakerModelConfig.setModels(modelInfoConfigList);
 
-        long l = TemplateMaker.makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, 1743817327068332032L);
+        long l = TemplateMaker.makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, null, 1743817327068332032L);
         System.out.println(l);
     }
 

@@ -13,10 +13,7 @@ import com.fly.maker.meta.enums.FileTypeEnum;
 import com.fly.maker.template.FileFilter;
 import com.fly.maker.template.enums.FileFilterRangeEnum;
 import com.fly.maker.template.enums.FileFilterRuleEnum;
-import com.fly.maker.template.model.FileFilterConfig;
-import com.fly.maker.template.model.TemplateMakerConfig;
-import com.fly.maker.template.model.TemplateMakerFileConfig;
-import com.fly.maker.template.model.TemplateMakerModelConfig;
+import com.fly.maker.template.model.*;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -37,7 +34,8 @@ public class TemplateMaker {
         Long id = templateMakerModelConfig.getId();
         TemplateMakerFileConfig fileConfig = templateMakerModelConfig.getFileConfig();
         TemplateMakerModelConfig modelConfig = templateMakerModelConfig.getModelConfig();
-        return makeTemplate(meta, originProjectPath, fileConfig, modelConfig, id);
+        TemplateMakerOutputConfig templateMakerOutputConfig = templateMakerModelConfig.getTemplateMakerOutputConfig();
+        return makeTemplate(meta, originProjectPath, fileConfig, modelConfig, templateMakerOutputConfig, id);
     }
 
 
@@ -51,7 +49,7 @@ public class TemplateMaker {
      * @param id                       旧项目id
      * @return id
      */
-    public static long makeTemplate(Meta newMeta, String originProjectPath, TemplateMakerFileConfig templateMakerFileConfig, TemplateMakerModelConfig templateMakerModelConfig, Long id) {
+    public static long makeTemplate(Meta newMeta, String originProjectPath, TemplateMakerFileConfig templateMakerFileConfig, TemplateMakerModelConfig templateMakerModelConfig, TemplateMakerOutputConfig templateMakerOutputConfig, Long id) {
         // 没有id就生成
         if (id == null) {
             id = IdUtil.getSnowflakeNextId();
@@ -133,6 +131,16 @@ public class TemplateMaker {
             modelConfig.setModels(modelInfoList);
             modelInfoList.addAll(newModelInfoList);
         }
+
+        // 判断是否需要去重
+        if (templateMakerOutputConfig != null) {
+            boolean removeGroupFilesFromRoot = templateMakerOutputConfig.isRemoveGroupFilesFromRoot();
+            if (removeGroupFilesFromRoot) {
+                List<Meta.FileConfig.FileInfo> fileInfoList = TemplateMakerUtils.removeGroupFilesFromRoot(newMeta.getFileConfig().getFiles());
+                newMeta.getFileConfig().setFiles(fileInfoList);
+            }
+        }
+
         // 4. 生成meta文件
         FileUtil.writeUtf8String(JSONUtil.toJsonPrettyStr(newMeta), metaOutputPath);
         return id;
@@ -499,7 +507,7 @@ public class TemplateMaker {
         templateMakerModelConfig.setModels(modelInfoConfigList);
 
 
-        long l = makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, 1743817327068332032L);
+        long l = makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, null, 1743817327068332032L);
         System.out.println(l);
     }
 }
