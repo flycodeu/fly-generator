@@ -190,7 +190,8 @@ public class TemplateMaker {
 
         String fileContent = null;
         // 如果之前不存在对应的模板文件，就使用输入路径创建新的文件
-        if (!FileUtil.exist(fileOutputAbsolutePath)) {
+        boolean hasTemplateFile = FileUtil.exist(fileOutputAbsolutePath);
+        if (!hasTemplateFile) {
             fileContent = FileUtil.readUtf8String(fileInputAbsolutePath);
         } else {
             // 存在对应的模板文件，就使用旧的模板文件的输出路径来进行读取
@@ -219,17 +220,25 @@ public class TemplateMaker {
         fileInfo.setInputPath(fileInputPath);
         fileInfo.setType(FileTypeEnum.FILE.getValue());
         fileInfo.setOutputPath(fileOutputPath);
+        fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
 
         // 判断新的文件内容和之前的文件内容是否相同
-        if (fileContent.equals(newFileContent)) {
-            // 静态文件，不需要生成,路径和原来输入路径一样
-            fileInfo.setOutputPath(fileInputPath);
-            fileInfo.setGenerateType(FileGenerateTypeEnum.STATIC.getValue());
-        } else {
-            fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
-            // 4.3 生成ftl文件
+        // 之前不存在模板，没有更改文件内容，就是静态的
+        boolean contentEquals = fileContent.equals(newFileContent);
+        if(!hasTemplateFile){
+            if (contentEquals) {
+                // 静态文件，不需要生成,路径和原来输入路径一样
+                fileInfo.setOutputPath(fileInputPath);
+                fileInfo.setGenerateType(FileGenerateTypeEnum.STATIC.getValue());
+            } else {
+                // 4.3 生成ftl文件
+                FileUtil.writeUtf8String(newFileContent, fileOutputAbsolutePath);
+            }
+        }else if (contentEquals){
+            // 之前存在模板并且内容不同
             FileUtil.writeUtf8String(newFileContent, fileOutputAbsolutePath);
         }
+
 
         return fileInfo;
     }
@@ -413,11 +422,12 @@ public class TemplateMaker {
         modelInfoConfig2.setDefaultValue("root");
         modelInfoConfig2.setReplaceText("root");
 
+
         List<TemplateMakerModelConfig.ModelInfoConfig> modelInfoConfigList = Arrays.asList(modelInfoConfig1, modelInfoConfig2);
         templateMakerModelConfig.setModels(modelInfoConfigList);
 
 
-        long l = makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, 1743535896794611712L);
+        long l = makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, 1743817327068332032L);
         System.out.println(l);
     }
 }
