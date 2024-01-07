@@ -223,7 +223,7 @@ public class TemplateMaker {
             // 过滤掉ftl文件
             fileList = fileList.stream().filter(file -> !file.getAbsolutePath().endsWith(".ftl")).collect(Collectors.toList());
             for (File file : fileList) {
-                Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(file, templateMakerModelConfig, sourceRootPath);
+                Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(file, templateMakerModelConfig, sourceRootPath,fileInfoConfig);
                 newFileInfoList.add(fileInfo);
             }
         }
@@ -251,14 +251,15 @@ public class TemplateMaker {
     }
 
     /**
-     * 生成文件模板
+     * 生成单个文件模板
      *
      * @param inputFile                输入的文件
      * @param templateMakerModelConfig 模型信息
      * @param sourceRootPath           根路径
+     * @param fileInfoConfig           文件信息
      * @return
      */
-    private static Meta.FileConfig.FileInfo makeFileTemplate(File inputFile, TemplateMakerModelConfig templateMakerModelConfig, String sourceRootPath) {
+    private static Meta.FileConfig.FileInfo makeFileTemplate(File inputFile, TemplateMakerModelConfig templateMakerModelConfig, String sourceRootPath, TemplateMakerFileConfig.FileInfoConfig fileInfoConfig) {
         // 获取绝对路径
         String fileInputAbsolutePath = inputFile.getAbsolutePath().replaceAll("\\\\", "/");
         String fileOutputAbsolutePath = fileInputAbsolutePath + ".ftl";
@@ -301,6 +302,7 @@ public class TemplateMaker {
         fileInfo.setInputPath(fileOutputPath);
         fileInfo.setType(FileTypeEnum.FILE.getValue());
         fileInfo.setOutputPath(fileInputPath);
+        fileInfo.setCondition(fileInfoConfig.getCondition());
         fileInfo.setGenerateType(FileGenerateTypeEnum.DYNAMIC.getValue());
 
         // 判断新的文件内容和之前的文件内容是否相同
