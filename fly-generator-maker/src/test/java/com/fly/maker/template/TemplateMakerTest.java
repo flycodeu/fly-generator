@@ -1,9 +1,12 @@
 package com.fly.maker.template;
 
+import cn.hutool.core.io.resource.ResourceUtil;
+import cn.hutool.json.JSONUtil;
 import com.fly.maker.meta.Meta;
 import com.fly.maker.template.enums.FileFilterRangeEnum;
 import com.fly.maker.template.enums.FileFilterRuleEnum;
 import com.fly.maker.template.model.FileFilterConfig;
+import com.fly.maker.template.model.TemplateMakerConfig;
 import com.fly.maker.template.model.TemplateMakerFileConfig;
 import com.fly.maker.template.model.TemplateMakerModelConfig;
 import org.junit.Test;
@@ -83,5 +86,14 @@ public class TemplateMakerTest {
 
         long l = TemplateMaker.makeTemplate(meta, originProjectPath, templateMakerFileConfig, templateMakerModelConfig, 1743817327068332032L);
         System.out.println(l);
+    }
+
+
+    @Test
+    public void testTemplateJson() {
+        String str = ResourceUtil.readUtf8Str("templateMaker.json");
+        TemplateMakerConfig templateMakerConfig = JSONUtil.toBean(str, TemplateMakerConfig.class);
+        long id = TemplateMaker.makeTemplate(templateMakerConfig);
+        System.out.println(id);
     }
 }
