@@ -33,4 +33,9 @@ public class TemplateMakerConfig {
      * 模型配置
      */
     private TemplateMakerModelConfig modelConfig = new TemplateMakerModelConfig();
+
+    /**
+     * 是否去重
+     */
+    private TemplateMakerOutputConfig templateMakerOutputConfig = new TemplateMakerOutputConfig();
 }
