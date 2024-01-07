@@ -14,6 +14,7 @@ import com.fly.maker.template.FileFilter;
 import com.fly.maker.template.enums.FileFilterRangeEnum;
 import com.fly.maker.template.enums.FileFilterRuleEnum;
 import com.fly.maker.template.model.FileFilterConfig;
+import com.fly.maker.template.model.TemplateMakerConfig;
 import com.fly.maker.template.model.TemplateMakerFileConfig;
 import com.fly.maker.template.model.TemplateMakerModelConfig;
 
@@ -23,6 +24,21 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class TemplateMaker {
+
+    /**
+     * 分装制作模板
+     * @param templateMakerModelConfig
+     * @return
+     */
+    public static long makeTemplate(TemplateMakerConfig templateMakerModelConfig) {
+        Meta meta = templateMakerModelConfig.getMeta();
+        String originProjectPath = templateMakerModelConfig.getOriginProjectPath();
+        Long id = templateMakerModelConfig.getId();
+        TemplateMakerFileConfig fileConfig = templateMakerModelConfig.getFileConfig();
+        TemplateMakerModelConfig modelConfig = templateMakerModelConfig.getModelConfig();
+        return makeTemplate(meta, originProjectPath, fileConfig, modelConfig, id);
+    }
+
 
     /**
      * 制作模板
