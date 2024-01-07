@@ -15,6 +15,7 @@ public class TemplateMakerFileConfig {
 
     private FileGroupConfig fileGroupConfig;
 
+
     @Data
     @NoArgsConstructor
     public static class FileInfoConfig {
@@ -27,6 +28,12 @@ public class TemplateMakerFileConfig {
          * 匹配规则
          */
         private List<FileFilterConfig> fileFilterConfigs;
+
+        /**
+         * 条件
+         */
+        private String condition;
+
     }
 
 
