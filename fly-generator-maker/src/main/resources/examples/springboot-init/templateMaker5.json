@@ -3,7 +3,8 @@
   "fileConfig": {
     "files": [
       {
-        "path": "src/main/java/com/yupi/springbootinit/config/Knife4jConfig.java"
+        "path": "src/main/java/com/yupi/springbootinit/config/Knife4jConfig.java",
+        "condition": "needDocs"
       }
     ]
   },
@@ -12,7 +13,8 @@
       "groupKey": "docsConfig",
       "groupName": "接口文档配置",
       "description": "接口文档参数配置",
-      "type": "DocsConfig"
+      "type": "DocsConfig",
+      "condition": "needDocs"
     },
     "models": [
       {

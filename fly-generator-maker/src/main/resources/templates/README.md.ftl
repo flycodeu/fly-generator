@@ -29,7 +29,7 @@ generator generate <#list modelConfig.models as modelInfo><#if modelInfo.groupKe
 <#if  modelInfo.groupKey??>
 
 分组标签: ${modelInfo.groupKey}
-分组条件: ${modelInfo.condition}
+分组条件: <#if modelInfo.condition??> ${modelInfo.condition}</#if>
     <#list modelInfo.models as submodelInfo>
 
 字段名：${submodelInfo.fieldName}

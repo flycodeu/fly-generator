@@ -5,10 +5,10 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Locale;
 
 /**
@@ -23,11 +23,11 @@ public class DynamicFileGenerator {
         File templateDir = new File(inputPath).getParentFile();
         configuration.setDirectoryForTemplateLoading(templateDir);
         // 第三步：设置模板文件使用的字符集。一般就是utf-8.
-//        configuration.setDefaultEncoding("utf-8");
+        configuration.setDefaultEncoding("utf-8");
         configuration.setEncoding(Locale.CANADA, "UTF-8");
         // 第四步：加载模板文件，创建一个模板对象。
         String templateName = new File(inputPath).getName();
-        Template template = configuration.getTemplate(templateName);
+        Template template = configuration.getTemplate(templateName,"utf-8");
 
         // 第五步：创建一个模板使用的数据集，可以是pojo也可以是map。一般是Map。
 
@@ -36,7 +36,7 @@ public class DynamicFileGenerator {
         if (!FileUtil.exist(outputPath)){
             FileUtil.touch(outputPath);
         }
-        Writer out = new FileWriter(outputPath);
+        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(Paths.get(outputPath)), StandardCharsets.UTF_8));
         // 第七步：调用模板对象的process方法输出文件。
         template.process(model, out);
 
