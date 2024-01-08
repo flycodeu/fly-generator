@@ -1,0 +1,41 @@
+{
+  "id": 1,
+  "fileConfig": {
+    "files": [
+      {
+        "path": "src/main/resources/application.yml"
+      }
+    ]
+  },
+  "modelConfig": {
+    "modelGroupConfig": {
+      "groupKey": "mysqlConfig",
+      "groupName": "数据库的配置",
+      "description": "数据库的配置",
+      "type": "MysqlConfig"
+    },
+    "models": [
+      {
+        "fieldName": "url",
+        "type": "String",
+        "description": "数据库地址",
+        "defaultValue": "jdbc:mysql://localhost:3306/my_db",
+        "replaceText": "jdbc:mysql://localhost:3306/my_db"
+      },
+      {
+        "fieldName": "username",
+        "type": "String",
+        "description": "用户名",
+        "defaultValue": "mroot",
+        "replaceText": "mroot"
+      },
+      {
+        "fieldName": "password",
+        "type": "String",
+        "description": "密码",
+        "defaultValue": "m123456",
+        "replaceText": "m123456"
+      }
+    ]
+  }
+}

@@ -174,15 +174,9 @@ public class TemplateMaker {
         // - 本次新增的模型配置列表
         // 有分组
         if (modelGroupConfig != null) {
-            String condition = modelGroupConfig.getCondition();
-            String groupKey = modelGroupConfig.getGroupKey();
-            String groupName = modelGroupConfig.getGroupName();
-
+            // 简化
             Meta.ModelConfig.ModelInfo modelInfo = new Meta.ModelConfig.ModelInfo();
-            modelInfo.setCondition(condition);
-            modelInfo.setGroupKey(groupKey);
-            modelInfo.setGroupName(groupName);
-
+            BeanUtil.copyProperties(modelGroupConfig, modelInfo);
             // 全部模型放到一个分组
             modelInfo.setModels(inputModelInfoList);
             newModelInfoList.add(modelInfo);
@@ -223,7 +217,7 @@ public class TemplateMaker {
             // 过滤掉ftl文件
             fileList = fileList.stream().filter(file -> !file.getAbsolutePath().endsWith(".ftl")).collect(Collectors.toList());
             for (File file : fileList) {
-                Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(file, templateMakerModelConfig, sourceRootPath,fileInfoConfig);
+                Meta.FileConfig.FileInfo fileInfo = makeFileTemplate(file, templateMakerModelConfig, sourceRootPath, fileInfoConfig);
                 newFileInfoList.add(fileInfo);
             }
         }
@@ -274,11 +268,11 @@ public class TemplateMaker {
         String fileContent = null;
         // 如果之前不存在对应的模板文件，就使用输入路径创建新的文件
         boolean hasTemplateFile = FileUtil.exist(fileOutputAbsolutePath);
-        if (!hasTemplateFile) {
-            fileContent = FileUtil.readUtf8String(fileInputAbsolutePath);
+        if (hasTemplateFile) {
+            fileContent = FileUtil.readUtf8String(fileOutputAbsolutePath);
         } else {
             // 存在对应的模板文件，就使用旧的模板文件的输出路径来进行读取
-            fileContent = FileUtil.readUtf8String(fileOutputAbsolutePath);
+            fileContent = FileUtil.readUtf8String(fileInputAbsolutePath);
         }
 
         TemplateMakerModelConfig.ModelGroupConfig modelGroupConfig = templateMakerModelConfig.getModelGroupConfig();
@@ -307,7 +301,7 @@ public class TemplateMaker {
 
         // 判断新的文件内容和之前的文件内容是否相同
         // 之前不存在模板，没有更改文件内容，就是静态的
-        boolean contentEquals = fileContent.equals(newFileContent);
+        boolean contentEquals = newFileContent.equals(fileContent);
         if (!hasTemplateFile) {
             if (contentEquals) {
                 // 静态文件，不需要生成,路径和原来输入路径一样
@@ -317,7 +311,7 @@ public class TemplateMaker {
                 // 4.3 生成ftl文件
                 FileUtil.writeUtf8String(newFileContent, fileOutputAbsolutePath);
             }
-        } else if (contentEquals) {
+        } else if (!contentEquals) {
             // 之前存在模板并且内容不同
             FileUtil.writeUtf8String(newFileContent, fileOutputAbsolutePath);
         }

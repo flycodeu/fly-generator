@@ -48,5 +48,15 @@ public class TemplateMakerModelConfig {
          * 分组的名称
          */
         private String groupName;
+
+        /**
+         * 描述信息
+         */
+        private String description;
+
+        /**
+         * 模型类型
+         */
+        private String type;
     }
 }
