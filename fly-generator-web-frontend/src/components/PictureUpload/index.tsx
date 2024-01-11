@@ -19,14 +19,13 @@ interface Props {
 const PictureUpload: React.FC<Props> = (props) => {
   const { biz, value, onChange } = props;
   // 防止用户在加载的时候上传其他文件
-  const [loading, setLoading] = useState<boolean>();
+  const [loading, setLoading] = useState<boolean>(false);
   const uploadProps: UploadProps = {
     name: 'file',
     multiple: false,
     maxCount: 1,
-    listType: 'picture-circle',
+    listType: 'picture-card',
     showUploadList: false,
-    disabled: loading,
     customRequest: async (fileObj: any) => {
       setLoading(true);
       try {
@@ -37,9 +36,9 @@ const PictureUpload: React.FC<Props> = (props) => {
           {},
           fileObj.file,
         );
-        const fullPath = COS_HOST + value;
+        const fullPath = COS_HOST + res.data;
         onChange?.(fullPath ?? '');
-        fileObj.onSuccess(res.data);
+        fileObj.onSuccess(fullPath);
       } catch (e: any) {
         message.error('上传失败' + e.message);
         fileObj.onError(e);
@@ -53,16 +52,16 @@ const PictureUpload: React.FC<Props> = (props) => {
    * 上传按钮
    */
   const uploadButton = (
-    <button style={{ border: 0, background: 'none' }} type="button">
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div style={{ marginTop: 8 }}>上传</div>
-    </button>
+      <div>
+        {loading ? <LoadingOutlined /> : <PlusOutlined />}
+        <div style={{ marginTop: 8 }}>上传</div>
+      </div>
   );
 
   return (
-    <Upload {...uploadProps}>
-      {value ? <img src={value} alt={'picture'} style={{ width: '100 %' }} /> : uploadButton}
-    </Upload>
+      <Upload {...uploadProps}>
+        {value ? <img src={value} alt="picture" style={{ width: '100%' }} /> : uploadButton}
+      </Upload>
   );
 };
 export default PictureUpload;
