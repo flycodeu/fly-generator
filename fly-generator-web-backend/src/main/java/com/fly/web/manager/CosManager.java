@@ -2,6 +2,8 @@ package com.fly.web.manager;
 
 import com.fly.web.config.CosClientConfig;
 import com.qcloud.cos.COSClient;
+import com.qcloud.cos.model.COSObject;
+import com.qcloud.cos.model.GetObjectRequest;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.PutObjectResult;
 import org.springframework.stereotype.Component;
@@ -45,5 +47,15 @@ public class CosManager {
         PutObjectRequest putObjectRequest = new PutObjectRequest(cosClientConfig.getBucket(), key,
                 file);
         return cosClient.putObject(putObjectRequest);
+    }
+
+    /**
+     * 文件下载
+     * @param filepath 唯一键，文件路径
+     * @return
+     */
+    public COSObject getCosObject(String filepath) {
+        GetObjectRequest getObjectRequest = new GetObjectRequest(cosClientConfig.getBucket(), filepath);
+        return cosClient.getObject(getObjectRequest);
     }
 }
