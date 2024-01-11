@@ -15,12 +15,13 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * 生成meta实体类
+ * 重写父类template的方法
  */
-public class MainGenerator extends GenerateTemplate{
+public class MainGenerator extends GenerateTemplate {
     @Override
-    protected void buildDist(String outputPath, String shellOutPutFilePath, String jarPath, String sourceCopyDestPath) {
+    protected String buildDist(String outputPath, String shellOutPutFilePath, String jarPath, String sourceCopyDestPath) {
         System.out.println("不生成dist");
+        return "";
     }
 
 

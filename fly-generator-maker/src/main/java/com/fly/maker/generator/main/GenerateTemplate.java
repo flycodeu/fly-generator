@@ -3,6 +3,7 @@ package com.fly.maker.generator.main;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.ZipUtil;
 import com.fly.maker.generator.GitGenerator;
 import com.fly.maker.generator.JarGenerator;
 import com.fly.maker.generator.ScriptGenerator;
@@ -45,6 +46,18 @@ public abstract class GenerateTemplate {
     }
 
     /**
+     * 构建zip打包
+     *
+     * @param outputPath
+     * @return
+     */
+    protected String buildZip(String outputPath) {
+        String zipPath = outputPath + ".zip";
+        ZipUtil.zip(outputPath, zipPath);
+        return zipPath;
+    }
+
+    /**
      * 构建精简版程序包，只有源模板和jar，脚本
      *
      * @param outputPath          输出路径
@@ -52,7 +65,7 @@ public abstract class GenerateTemplate {
      * @param jarPath             原始的jar路径
      * @param sourceCopyDestPath  复制地址路径
      */
-    protected  void buildDist(String outputPath, String shellOutPutFilePath, String jarPath, String sourceCopyDestPath) {
+    protected String buildDist(String outputPath, String shellOutPutFilePath, String jarPath, String sourceCopyDestPath) {
         // 目标地址就是和之前的目录同级别加了-dist
         String destOutPutPath = outputPath + "-dest";
         // 复制jar包
@@ -70,6 +83,7 @@ public abstract class GenerateTemplate {
 
         // 复制源模板
         FileUtil.copy(sourceCopyDestPath, destOutPutPath, true);
+        return destOutPutPath;
     }
 
     /**
@@ -79,7 +93,7 @@ public abstract class GenerateTemplate {
      * @param jarPath    jar所在的路径
      * @return
      */
-    protected  String getShellOutPutFilePath(String outputPath, String jarPath) {
+    protected String getShellOutPutFilePath(String outputPath, String jarPath) {
         String shellOutPutFilePath = outputPath + File.separator + "generator";
         ScriptGenerator.doGenerate(shellOutPutFilePath, jarPath);
         return shellOutPutFilePath;
@@ -95,7 +109,7 @@ public abstract class GenerateTemplate {
      * @throws IOException
      * @throws InterruptedException
      */
-    protected  String buildJar(Meta meta, String outputPath) throws IOException, InterruptedException {
+    protected String buildJar(Meta meta, String outputPath) throws IOException, InterruptedException {
         JarGenerator.doGenerator(outputPath);
         String jarName = String.format("%s-%s-jar-with-dependencies.jar", meta.getName(), meta.getVersion());
         String jarPath = "target/" + jarName;
@@ -111,7 +125,7 @@ public abstract class GenerateTemplate {
      * @throws TemplateException
      * @throws InterruptedException
      */
-    protected  void generateCode(Meta meta, String outputPath) throws IOException, TemplateException, InterruptedException {
+    protected void generateCode(Meta meta, String outputPath) throws IOException, TemplateException, InterruptedException {
         ClassPathResource classPathResource = new ClassPathResource("");
         String inputResourcePath = classPathResource.getAbsolutePath();
 
@@ -173,7 +187,6 @@ public abstract class GenerateTemplate {
         outputFilePath = outputBaseJavaPackagePath + File.separator + "Main.java";
         //System.out.println(outputFilePath);
         DynamicFileGenerator.doGenerate(inputFilePath, outputFilePath, meta);
-
 
 
         // 生成StaticFileGenerator
