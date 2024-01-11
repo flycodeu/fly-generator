@@ -1,3 +1,4 @@
+import FileUpload from '@/components/FileUpload';
 import { listGeneratorVoByPageUsingPost } from '@/services/backend/generatorController';
 import { UserOutlined } from '@ant-design/icons';
 import { PageContainer, ProFormText, QueryFilter } from '@ant-design/pro-components';
