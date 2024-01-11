@@ -64,6 +64,10 @@ const GeneratorAddPage: React.FC = () => {
     loadData();
   }, [id]);
 
+  /**
+   * 添加
+   * @param values
+   */
   const doAdd = async (values: API.GeneratorAddRequest) => {
     try {
       const res = await addGeneratorUsingPost(values);
@@ -76,12 +80,16 @@ const GeneratorAddPage: React.FC = () => {
     }
   };
 
+  /**
+   * 修改
+   * @param values
+   */
   const doUpdate = async (values: API.GeneratorEditRequest) => {
     try {
       const res = await editGeneratorUsingPost(values);
       if (res.data) {
         message.success('更新成功');
-        history.push(`/generator/detail/${res.data}`);
+        history.push(`/generator/detail/${id}`);
       }
     } catch (e: any) {
       message.error('更新失败' + e.message);

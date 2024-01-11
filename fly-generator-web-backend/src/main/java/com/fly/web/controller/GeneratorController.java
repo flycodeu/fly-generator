@@ -269,7 +269,7 @@ public class GeneratorController {
      * @throws IOException
      */
     @GetMapping( "/download" )
-    public void download(Long id, HttpServletResponse response, HttpServletRequest request) throws IOException {
+    public void downloadGeneratorById(Long id, HttpServletResponse response, HttpServletRequest request) throws IOException {
         if (id <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
@@ -280,7 +280,7 @@ public class GeneratorController {
         }
         String filepath = generator.getDistPath();
         if (StrUtil.isBlank(filepath)) {
-            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "产物吧哦不存在");
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "产物包不存在");
         }
 
         // 追踪事件
@@ -307,5 +307,4 @@ public class GeneratorController {
             }
         }
     }
-
 }

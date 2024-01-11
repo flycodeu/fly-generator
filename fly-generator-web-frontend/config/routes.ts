@@ -30,6 +30,13 @@ export default [
     hideInMenu: true,
   },
   {
+    path: '/generator/detail/:id',
+    icon: 'home',
+    component: './Generator/Detail',
+    name: '修改生成器',
+    hideInMenu: true,
+  },
+  {
     path: '/admin',
     icon: 'crown',
     name: '管理页',
