@@ -8,7 +8,12 @@ export default [
     ],
   },
   { path: '/', icon: 'home', component: './Index', name: '主页' },
-  { path: '/user/settings', component: './User/Settings',icon: 'user',name: '个人设置' },
+  { path: '/user/settings', component: './User/Settings', icon: 'user', name: '个人设置' },
+  {
+    path: '/test/file',
+    icon: 'home',
+    component: './Test/File',
+    name: '文件上传下载测试'},
   {
     path: '/admin',
     icon: 'crown',
@@ -16,7 +21,7 @@ export default [
     access: 'canAdmin',
     routes: [
       { icon: 'table', path: '/admin/user', component: './Admin/User', name: '用户管理' },
-      { icon: 'table', path: '/admin/generator', component: './Admin/Generator', name: '代码管理' }
+      { icon: 'table', path: '/admin/generator', component: './Admin/Generator', name: '代码管理' },
     ],
   },
   { path: '/', redirect: '/welcome' },

@@ -1,10 +1,12 @@
 package com.fly.web.controller;
 
 import cn.hutool.core.io.FileUtil;
+import com.fly.web.annotation.AuthCheck;
 import com.fly.web.common.BaseResponse;
 import com.fly.web.common.ErrorCode;
 import com.fly.web.common.ResultUtils;
 import com.fly.web.constant.FileConstant;
+import com.fly.web.constant.UserConstant;
 import com.fly.web.exception.BusinessException;
 import com.fly.web.manager.CosManager;
 import com.fly.web.model.dto.file.UploadFileRequest;
@@ -46,8 +48,9 @@ public class FileController {
      * @param multipartFile
      * @return
      */
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE )
     @PostMapping( "/test/upload" )
-    public BaseResponse<String> upload(@RequestPart( "file" ) MultipartFile multipartFile) {
+    public BaseResponse<String> testUpload(@RequestPart( "file" ) MultipartFile multipartFile) {
         String filename = multipartFile.getOriginalFilename();
         String filePath = String.format("/test/%s", filename);
         File file = null;
@@ -80,8 +83,9 @@ public class FileController {
      * @return
      * @throws IOException
      */
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE )
     @GetMapping( "/test/download" )
-    public void download(String filepath, HttpServletResponse response) throws IOException {
+    public void testDownload(String filepath, HttpServletResponse response) throws IOException {
         COSObjectInputStream cosObjectInput = null;
         try {
             COSObject cosObject = cosManager.getCosObject(filepath);
