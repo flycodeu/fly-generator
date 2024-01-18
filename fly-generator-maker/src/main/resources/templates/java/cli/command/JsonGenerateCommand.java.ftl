@@ -29,7 +29,6 @@ public class JsonGenerateCommand implements Callable<Integer> {
         // 读取json文件
         String jsonStr = FileUtil.readUtf8String(filePath);
         DataModel dataModel = JSONUtil.toBean(jsonStr, DataModel.class);
-        BeanUtil.copyProperties(this, dataModel);
         MainGenerator.doGenerate(dataModel);
         return 0;
     }
