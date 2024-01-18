@@ -94,3 +94,4 @@ knife4j:
         api-rule: package
         api-rule-resources:
           - com.fly.web.controller
+

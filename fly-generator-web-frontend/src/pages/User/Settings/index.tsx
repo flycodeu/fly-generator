@@ -1,9 +1,13 @@
+import { useModel } from '@@/exports';
 import { PageContainer, ProForm, ProFormText } from '@ant-design/pro-components';
 import '@umijs/max';
 import { Card } from 'antd';
 import React from 'react';
 
 const UserSettingsPage: React.FC = () => {
+  const { initialState } = useModel('@@initialState');
+  const { currentUser } = initialState ?? {};
+
   return (
     <PageContainer content={' 个人信息'}>
       <Card>
@@ -15,7 +19,7 @@ const UserSettingsPage: React.FC = () => {
             },
           }}
         >
-          <ProFormText name={'userAccount'} label={'账号'} disabled={true}></ProFormText>
+          {/*<ProFormText name={'userAccount'} label={'账号'} disabled={true}></ProFormText>*/}
           <ProFormText name={'username'} label={'昵称'}></ProFormText>
           <ProFormText name={'userProfile'} label={'个人简介'}></ProFormText>
           <ProFormText name={'userRole'} label={'用户角色'}></ProFormText>
