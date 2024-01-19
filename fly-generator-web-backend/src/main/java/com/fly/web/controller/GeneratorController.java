@@ -365,9 +365,10 @@ public class GeneratorController {
         FileUtil.writeUtf8String(jsonStr, dataModelPath);
         //6. 执行脚本
         //6.1 找到脚本
+        // 需要注意不是windows的使用generator
         File scriptFile = FileUtil.loopFiles(unzipDir, 2, null)
                 .stream()
-                .filter(file -> file.isFile() && "generator".equals(file.getName()))
+                .filter(file -> file.isFile() && "generator.bat".equals(file.getName()))
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
         //6.2 添加权限
@@ -380,7 +381,8 @@ public class GeneratorController {
 //        }
         //6.3执行脚本
         // 构建命令
-        String[] commands = new String[]{"./generator", "json-generate", "--file=" + dataModelPath};
+        String scriptAbsolutePath = scriptFile.getAbsolutePath().replace("\\", "/");
+        String[] commands = new String[]{scriptAbsolutePath, "json-generate", "--file=" + dataModelPath};
         File scriptDir = scriptFile.getParentFile();
         //todo 修复存在的命令行的bug
         ProcessBuilder processBuilder = new ProcessBuilder(commands);
