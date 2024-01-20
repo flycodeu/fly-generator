@@ -1,10 +1,15 @@
 package com.fly.web.controller;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fly.maker.generator.main.GenerateTemplate;
+import com.fly.maker.generator.main.ZipGenerator;
+import com.fly.maker.meta.MetaValidator;
 import com.fly.web.annotation.AuthCheck;
 import com.fly.web.common.BaseResponse;
 import com.fly.web.common.DeleteRequest;
@@ -24,6 +29,7 @@ import com.fly.web.service.impl.GeneratorServiceImpl;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.COSObjectInputStream;
 import com.qcloud.cos.utils.IOUtils;
+import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -416,4 +422,74 @@ public class GeneratorController {
             FileUtil.del(tempDirPath);
         });
     }
+
+
+    /**
+     * 制作代码生成器
+     *
+     * @param generatorMakeRequest
+     * @param response
+     * @param request
+     * @throws IOException
+     */
+    @PostMapping( "/make" )
+    public void makeGenerator(@RequestBody GeneratorMakeRequest generatorMakeRequest, HttpServletResponse response, HttpServletRequest request) throws IOException {
+        // 1. 获取参数
+        Meta meta = generatorMakeRequest.getMeta();
+        String zipFilePath = generatorMakeRequest.getZipFilePath();
+        if (StrUtil.isBlank(zipFilePath)) {
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "压缩包不存在");
+        }
+
+        // 2. 判断用户是否登录
+        User loginUser = userService.getLoginUser(request);
+        log.info("用户{}制作代码生成器", loginUser.getId());
+
+        // 3. 创建临时工作目录，使用make目录,里面包含了一个随机数目录，随机数目录里面包含项目的模板文件和压缩包,下载到本地
+        String projectPath = System.getProperty("user.dir");
+        String id = IdUtil.getSnowflakeNextId() + RandomUtil.randomString(6);
+        String tempDirPath = String.format("%s/.temp/make/%s", projectPath, id);
+        String localZipFilePath = tempDirPath + "/project.zip";
+
+        if (!FileUtil.exist(localZipFilePath)) {
+            FileUtil.touch(localZipFilePath);
+        }
+
+        // 下载到服务器
+        try {
+            cosManager.download(zipFilePath, localZipFilePath);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        // 4. 解压压缩包到临时目录
+        File unzipDistDir = ZipUtil.unzip(localZipFilePath);
+        // 5. 构造元信息的相关配置，以及输入路径
+        String sourceRootPath = unzipDistDir.getAbsolutePath();
+        meta.getFileConfig().setSourceRootPath(sourceRootPath);
+        MetaValidator.doValidateAndFill(meta);
+        String outputPath = String.format("%s/generated/%s", tempDirPath, meta.getName());
+        // 6. 调用make工具
+
+        GenerateTemplate generateTemplate = new ZipGenerator();
+        try {
+            generateTemplate.doGenerate(meta, outputPath);
+        } catch (Exception e) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "下载失败");
+        }
+
+        // 7. 压缩文件结果返回前端,我的压缩包的地址名字是dest而不是dist
+        String suffix = "-dest.zip";
+        String zipFileName = meta.getName() + suffix;
+        String distZipFilePath = outputPath + suffix;
+        log.info("distZipFilePath: {}", distZipFilePath);
+        response.setContentType("application/octet-stream;charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=" + zipFileName);
+        Files.copy(Paths.get(distZipFilePath), response.getOutputStream());
+        // 8. 异步删除文件
+        CompletableFuture.runAsync(() -> {
+            FileUtil.del(tempDirPath);
+        });
+    }
+
+
 }
