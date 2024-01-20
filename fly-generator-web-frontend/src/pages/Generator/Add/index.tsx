@@ -1,6 +1,7 @@
 import FileUpload from '@/components/FileUpload';
 import PictureUpload from '@/components/PictureUpload';
 import { COS_HOST } from '@/constants';
+import FileConfigForm from '@/pages/Generator/Add/components/FileConfigForm';
 import ModelConfigForm from '@/pages/Generator/Add/components/ModelConfigForm';
 import {
   addGeneratorUsingPost,
@@ -155,8 +156,6 @@ const GeneratorAddPage: React.FC = () => {
             <ProFormText name="author" label="作者" width="lg" placeholder="请输入作者名" />
             <ProFormSelect label="标签" mode="tags" name="tags" placeholder="请输入标签列表" />
           </StepsForm.StepForm>
-          {/*todo 文件配置*/}
-          <StepsForm.StepForm name="fileConfig" title="文件配置"></StepsForm.StepForm>
           {/*todo 模型配置*/}
           <StepsForm.StepForm
             name="modelConfig"
@@ -166,7 +165,11 @@ const GeneratorAddPage: React.FC = () => {
               return true;
             }}
           >
-            <ModelConfigForm formRef={formRef} oldData={oldData}/>
+            <ModelConfigForm formRef={formRef} oldData={oldData} />
+          </StepsForm.StepForm>
+          {/*todo 文件配置*/}
+          <StepsForm.StepForm name="fileConfig" title="文件配置">
+            <FileConfigForm formRef={formRef} oldData={oldData}></FileConfigForm>
           </StepsForm.StepForm>
           <StepsForm.StepForm name="dist" title="生成器文件">
             <ProFormItem label={'产物包'} name={'distPath'}>
