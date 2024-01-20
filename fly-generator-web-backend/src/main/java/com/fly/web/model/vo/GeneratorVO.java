@@ -1,7 +1,7 @@
 package com.fly.web.model.vo;
 
 import cn.hutool.json.JSONUtil;
-import com.fly.web.meta.Meta;
+import com.fly.maker.meta.Meta;
 import com.fly.web.model.entity.Generator;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;

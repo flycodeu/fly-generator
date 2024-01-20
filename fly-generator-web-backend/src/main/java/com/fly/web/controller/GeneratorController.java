@@ -14,7 +14,7 @@ import com.fly.web.constant.UserConstant;
 import com.fly.web.exception.BusinessException;
 import com.fly.web.exception.ThrowUtils;
 import com.fly.web.manager.CosManager;
-import com.fly.web.meta.Meta;
+import com.fly.maker.meta.Meta;
 import com.fly.web.model.dto.generator.*;
 import com.fly.web.model.entity.Generator;
 import com.fly.web.model.entity.User;

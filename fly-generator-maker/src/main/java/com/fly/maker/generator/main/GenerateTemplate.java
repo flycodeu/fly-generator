@@ -143,7 +143,8 @@ public abstract class GenerateTemplate {
      */
     protected void generateCode(Meta meta, String outputPath) throws IOException, TemplateException, InterruptedException {
         ClassPathResource classPathResource = new ClassPathResource("");
-        String inputResourcePath = classPathResource.getAbsolutePath();
+        // 从相对路径获取
+        String inputResourcePath ="";
 
         // 生成java包的基础路径
         // com.fly

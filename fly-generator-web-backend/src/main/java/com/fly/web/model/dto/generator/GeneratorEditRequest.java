@@ -1,6 +1,6 @@
 package com.fly.web.model.dto.generator;
 
-import com.fly.web.meta.Meta;
+import com.fly.maker.meta.Meta;
 import lombok.Data;
 
 import java.io.Serializable;
