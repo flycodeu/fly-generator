@@ -28,6 +28,23 @@ public abstract class GenerateTemplate {
         if (!FileUtil.exist(outputPath)) {
             FileUtil.mkdir(outputPath);
         }
+        doGenerate(meta,outputPath);
+    }
+
+
+    /**
+     * 支持传入参数调用maker制作工具
+     * @param meta
+     * @param outputPath
+     * @throws TemplateException
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public void doGenerate(  Meta meta,String outputPath ) throws TemplateException, IOException, InterruptedException {
+        // 不存在路径
+        if (!FileUtil.exist(outputPath)) {
+            FileUtil.mkdir(outputPath);
+        }
 
         // 1. 原始模板路径复制到生成的代码包中去
         String sourceCopyDestPath = copySource(meta, outputPath);
@@ -44,7 +61,6 @@ public abstract class GenerateTemplate {
         //5.精简版程序包，只有源模板和jar，脚本
         buildDist(outputPath, shellOutputFilePath, jarPath, sourceCopyDestPath);
     }
-
     /**
      * 构建zip打包
      *
