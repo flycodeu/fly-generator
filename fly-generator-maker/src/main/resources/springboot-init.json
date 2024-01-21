@@ -1,8 +1,15 @@
 {
   "name": "springboot-init-generator",
   "description": "Spring Boot 模板项目生成器",
+  "basePackage": "com.fly",
+  "version": "1.0",
+  "author": "fly",
+  "createTime": "2023-12-22",
   "fileConfig": {
-    "sourceRootPath": "D:/fly/project/fly-generator/fly-generator/fly-generator-maker/.temp/1/springboot-init",
+    "inputRootPath": ".source/springboot-init-pro",
+    "outputRootPath": "generated",
+    "sourceRootPath": "D:/fly/project/fly-generator/fly-generator/fly-generator-demo-projects/springboot-init-pro",
+    "type": "dir",
     "files": [
       {
         "type": "group",
@@ -135,12 +142,6 @@
         "generateType": "static"
       },
       {
-        "inputPath": "src/test/.DS_Store",
-        "outputPath": "src/test/.DS_Store",
-        "type": "file",
-        "generateType": "static"
-      },
-      {
         "inputPath": "src/main/java/com/yupi/springbootinit/constant/UserConstant.java.ftl",
         "outputPath": "src/main/java/com/yupi/springbootinit/constant/UserConstant.java",
         "type": "file",
@@ -163,12 +164,6 @@
         "outputPath": "src/main/java/com/yupi/springbootinit/model/dto/user/UserAddRequest.java",
         "type": "file",
         "generateType": "dynamic"
-      },
-      {
-        "inputPath": ".DS_Store",
-        "outputPath": ".DS_Store",
-        "type": "file",
-        "generateType": "static"
       },
       {
         "inputPath": "src/main/java/com/yupi/springbootinit/model/entity/User.java.ftl",
@@ -308,12 +303,6 @@
         "outputPath": "src/main/java/com/yupi/springbootinit/MainApplication.java",
         "type": "file",
         "generateType": "dynamic"
-      },
-      {
-        "inputPath": "src/.DS_Store",
-        "outputPath": "src/.DS_Store",
-        "type": "file",
-        "generateType": "static"
       },
       {
         "inputPath": "src/main/java/com/yupi/springbootinit/mapper/UserMapper.java.ftl",

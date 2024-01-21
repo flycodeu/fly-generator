@@ -1,0 +1,11 @@
+{
+  "needEs": false,
+  "needRedis": false,
+  "needDocs": false,
+  "needPost": false,
+  "mysqlConfig": {
+    "password": "111112",
+    "url": "123123123",
+    "username": "root"
+  }
+}
