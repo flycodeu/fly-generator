@@ -4,12 +4,13 @@ import {
   deleteGeneratorUsingPost,
   listGeneratorByPageUsingPost,
 } from '@/services/backend/generatorController';
-import {PlusOutlined} from '@ant-design/icons';
-import type {ActionType, ProColumns} from '@ant-design/pro-components';
-import {ProTable} from '@ant-design/pro-components';
+import { PlusOutlined } from '@ant-design/icons';
+import type { ActionType, ProColumns } from '@ant-design/pro-components';
+import { ProTable } from '@ant-design/pro-components';
 import '@umijs/max';
-import {Button, message, Select, Space, Tag, Typography} from 'antd';
-import React, {useRef, useState} from 'react';
+import { Button, message, Select, Space, Tag, Typography } from 'antd';
+import React, { useRef, useState } from 'react';
+import ReactJson from 'react-json-view';
 
 /**
  * 用户管理页面
@@ -24,7 +25,7 @@ const GeneratorAdminPage: React.FC = () => {
   const actionRef = useRef<ActionType>();
   // 当前用户点击的数据
   const [currentRow, setCurrentRow] = useState<API.Generator>();
-
+  const [keys,setKeys] = useState<[]>([]);
   /**
    * 删除节点
    *
@@ -97,9 +98,9 @@ const GeneratorAdminPage: React.FC = () => {
       dataIndex: 'tags',
       valueType: 'text',
       renderFormItem: (schema) => {
-        const {fieldProps} = schema;
+        const { fieldProps } = schema;
         // @ts-ignore
-        return <Select {...fieldProps} mode="tags"/>;
+        return <Select {...fieldProps} mode="tags" />;
       },
       render(_, record) {
         if (!record.tags) {
@@ -115,16 +116,7 @@ const GeneratorAdminPage: React.FC = () => {
       dataIndex: 'distPath',
       valueType: 'text',
     },
-    {
-      title: '文件配置',
-      dataIndex: 'fileConfig',
-      valueType: 'jsonCode',
-    },
-    {
-      title: '模型配置',
-      dataIndex: 'modelConfig',
-      valueType: 'jsonCode',
-    },
+
     {
       title: '状态',
       dataIndex: 'status',
@@ -183,13 +175,16 @@ const GeneratorAdminPage: React.FC = () => {
       ),
     },
   ];
+  // @ts-ignore
   return (
     <div className="admin-generator-page">
-      <Typography.Title level={4} style={{marginBottom: 16}}>生成器管理</Typography.Title>
+      <Typography.Title level={4} style={{ marginBottom: 16 }}>
+        生成器管理
+      </Typography.Title>
       <ProTable<API.Generator>
         headerTitle={'查询表格'}
         actionRef={actionRef}
-        rowKey="key"
+        rowKey={(record) => record.id as any }
         search={{
           labelWidth: 120,
         }}
@@ -201,14 +196,14 @@ const GeneratorAdminPage: React.FC = () => {
               setCreateModalVisible(true);
             }}
           >
-            <PlusOutlined/> 新建
+            <PlusOutlined /> 新建
           </Button>,
         ]}
         request={async (params, sort, filter) => {
           const sortField = Object.keys(sort)?.[0];
           const sortOrder = sort?.[sortField] ?? undefined;
 
-          const {data, code} = await listGeneratorByPageUsingPost({
+          const { data, code } = await listGeneratorByPageUsingPost({
             ...params,
             sortField,
             sortOrder,
@@ -222,6 +217,9 @@ const GeneratorAdminPage: React.FC = () => {
           };
         }}
         columns={columns}
+        expandable={{
+          expandedRowRender: (record) => <ReactJson src={JSON.parse(record?.fileConfig)} />,
+        }}
       />
       <CreateModal
         visible={createModalVisible}

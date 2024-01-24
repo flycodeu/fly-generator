@@ -24,9 +24,9 @@ import { Link } from 'umi';
  */
 const DEFAULT_PAGE_PARAMS: PageRequest = {
   current: 1,
-  pageSize: 4,
+  pageSize: 12,
   sortField: 'createTime',
-  sortOrder: 'descend',
+  sortOrder: 'ascend',
 };
 
 const items: TabsProps['items'] = [
