@@ -10,6 +10,7 @@ import java.util.List;
 public class Meta {
 
     private String name;
+    private String projectName;
     private String description;
     private String basePackage;
     private String version;

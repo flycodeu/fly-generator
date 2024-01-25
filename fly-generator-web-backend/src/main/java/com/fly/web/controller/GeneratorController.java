@@ -6,6 +6,7 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fly.maker.generator.main.GenerateTemplate;
 import com.fly.maker.generator.main.ZipGenerator;
@@ -29,6 +30,7 @@ import com.fly.web.service.impl.GeneratorServiceImpl;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.COSObjectInputStream;
 import com.qcloud.cos.utils.IOUtils;
+import javafx.scene.paint.Stop;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.StopWatch;
@@ -200,9 +202,56 @@ public class GeneratorController {
         long size = generatorQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
         Page<Generator> generatorPage = generatorService.page(new Page<>(current, size),
                 generatorService.getQueryWrapper(generatorQueryRequest));
-        return ResultUtils.success(generatorService.getGeneratorVOPage(generatorPage, request));
+        stopWatch.stop();
+        System.out.println("查询生成器耗时" + stopWatch.getTotalTimeMillis());
+
+        stopWatch = new StopWatch();
+        stopWatch.start();
+        Page<GeneratorVO> generatorVOPage = generatorService.getGeneratorVOPage(generatorPage, request);
+        stopWatch.stop();
+        System.out.println("查询关联数据耗时：" + stopWatch.getTotalTimeMillis());
+
+        return ResultUtils.success(generatorVOPage);
+    }
+
+
+    /**
+     * 快速分页获取列表（封装类）
+     *
+     * @param generatorQueryRequest 查询请求
+     * @param request               获取对象
+     * @return page
+     */
+    @PostMapping( "/list/page/vo/fast" )
+    public BaseResponse<Page<GeneratorVO>> listGeneratorVOByPageFast(@RequestBody GeneratorQueryRequest generatorQueryRequest,
+                                                                     HttpServletRequest request) {
+        long current = generatorQueryRequest.getCurrent();
+        long size = generatorQueryRequest.getPageSize();
+        // 限制爬虫
+        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+
+        QueryWrapper<Generator> queryWrapper = generatorService.getQueryWrapper(generatorQueryRequest);
+        queryWrapper.select("id",
+                "name",
+                "description",
+                "tags",
+                "picture",
+                "status",
+                "userId",
+                "createTime",
+                "updateTime"
+        );
+        Page<Generator> generatorPage = generatorService.page(new Page<>(current, size), queryWrapper);
+
+        Page<GeneratorVO> generatorVOPage = generatorService.getGeneratorVOPage(generatorPage, request);
+
+
+        return ResultUtils.success(generatorVOPage);
     }
 
     /**
@@ -367,18 +416,40 @@ public class GeneratorController {
         if (!FileUtil.exist(zipFilePath)) {
             FileUtil.touch(zipFilePath);
         }
-        try {
-            cosManager.download(distPath, zipFilePath);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        String cacheFilePath = getCacheFilePath(id, distPath);
+        if (FileUtil.exist(cacheFilePath)) {
+            Files.copy(Paths.get(cacheFilePath), Files.newOutputStream(Paths.get(zipFilePath)));
+        } else {
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            try {
+                cosManager.download(distPath, zipFilePath);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            stopWatch.stop();
+            System.out.println("下载文件耗时：" + stopWatch.getTotalTimeSeconds() + "秒");
         }
+
+
+//        stopWatch = new StopWatch();
+//        stopWatch.start();
         //4.2 解压文件
         File unzipDir = ZipUtil.unzip(zipFilePath);
+//        stopWatch.stop();
+//        System.out.println("解压文件耗时：" + stopWatch.getTotalTimeSeconds() + "秒");
 
         //5. 用户参数写入json
         String dataModelPath = tempDirPath + "/dataModel.json";
         String jsonStr = JSONUtil.toJsonStr(dataModel);
+//        stopWatch = new StopWatch();
+//        stopWatch.start();
         FileUtil.writeUtf8String(jsonStr, dataModelPath);
+//        stopWatch.stop();
+//        System.out.println("写入json文件耗时：" + stopWatch.getTotalTimeSeconds() + "秒");
+
+//        stopWatch = new StopWatch();
+//        stopWatch.start();
         //6. 执行脚本
         //6.1 找到脚本
         // 需要注意不是windows的使用generator
@@ -387,6 +458,9 @@ public class GeneratorController {
                 .filter(file -> file.isFile() && "generator.bat".equals(file.getName()))
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
+//        stopWatch.stop();
+//        System.out.println("查找脚本耗时：" + stopWatch.getTotalTimeSeconds() + "秒");
+
         //6.2 添加权限
         //todo 修复权限
 //        try {
@@ -397,6 +471,8 @@ public class GeneratorController {
 //        }
         //6.3执行脚本
         // 构建命令
+//        stopWatch = new StopWatch();
+//        stopWatch.start();
         String scriptAbsolutePath = scriptFile.getAbsolutePath().replace("\\", "/");
         String[] commands = new String[]{scriptAbsolutePath, "json-generate", "--file=" + dataModelPath};
         File scriptDir = scriptFile.getParentFile();
@@ -417,8 +493,12 @@ public class GeneratorController {
         } catch (Exception e) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "执行命令失败");
         }
+        //stopWatch.stop();
+        //    System.out.println("Maven打包命令执行完毕，耗时：" + stopWatch.getTotalTimeSeconds() + "秒");
 
-
+//
+//        stopWatch = new StopWatch();
+//        stopWatch.start();
         //7. 压缩文件结果返回前端
         String generatePath = scriptDir.getAbsolutePath() + "/generated";
         String resultPath = tempDirPath + "/result.zip";
@@ -426,6 +506,9 @@ public class GeneratorController {
         response.setContentType("application/octet-stream;charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=" + resultFile.getName());
         Files.copy(resultFile.toPath(), response.getOutputStream());
+//        stopWatch.stop();
+        // System.out.println("压缩文件返回前端，耗时：" + stopWatch.getTotalTimeSeconds() + "秒");
+
 
         // 异步删除文件
         CompletableFuture.runAsync(() -> {
@@ -464,13 +547,17 @@ public class GeneratorController {
         if (!FileUtil.exist(localZipFilePath)) {
             FileUtil.touch(localZipFilePath);
         }
-
+//        StopWatch stopWatch = new StopWatch();
+//        stopWatch.start();
         // 下载到服务器
         try {
             cosManager.download(zipFilePath, localZipFilePath);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+//        stopWatch.stop();
+//        System.out.println("下载到服务器耗时：" + stopWatch.getTotalTimeMillis() + "ms");
+
         // 4. 解压压缩包到临时目录
         File unzipDistDir = ZipUtil.unzip(localZipFilePath);
         // 5. 构造元信息的相关配置，以及输入路径
@@ -495,6 +582,8 @@ public class GeneratorController {
         response.setContentType("application/octet-stream;charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=" + zipFileName);
         Files.copy(Paths.get(distZipFilePath), response.getOutputStream());
+
+
         // 8. 异步删除文件
         CompletableFuture.runAsync(() -> {
             FileUtil.del(tempDirPath);
