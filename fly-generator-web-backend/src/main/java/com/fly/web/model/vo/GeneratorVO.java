@@ -6,6 +6,7 @@ import com.fly.web.model.entity.Generator;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -13,7 +14,9 @@ import java.util.List;
  * 代码生成器vo
  */
 @Data
-public class GeneratorVO {
+public class GeneratorVO implements Serializable {
+
+    private static final long serialVersionUID = 6317475437950178046L;
     /**
      * 相应人的信息
      */

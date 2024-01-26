@@ -1,6 +1,8 @@
 package com.fly.web.controller;
 
+import cn.hutool.core.codec.Base64Encoder;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
@@ -19,6 +21,7 @@ import com.fly.web.common.ResultUtils;
 import com.fly.web.constant.UserConstant;
 import com.fly.web.exception.BusinessException;
 import com.fly.web.exception.ThrowUtils;
+import com.fly.web.manager.CacheManager;
 import com.fly.web.manager.CosManager;
 import com.fly.maker.meta.Meta;
 import com.fly.web.model.dto.generator.*;
@@ -30,9 +33,10 @@ import com.fly.web.service.impl.GeneratorServiceImpl;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.COSObjectInputStream;
 import com.qcloud.cos.utils.IOUtils;
-import javafx.scene.paint.Stop;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +49,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 代码生成器接口
@@ -62,6 +67,9 @@ public class GeneratorController {
 
     @Resource
     private CosManager cosManager;
+
+    @Resource
+    private CacheManager cacheManager;
 
     /**
      * 创建代码生成器
@@ -232,6 +240,13 @@ public class GeneratorController {
                                                                      HttpServletRequest request) {
         long current = generatorQueryRequest.getCurrent();
         long size = generatorQueryRequest.getPageSize();
+        // 缓存获取数据
+        String cacheKey = getPageKey(generatorQueryRequest);
+        Object value = cacheManager.get(cacheKey);
+        if (value!=null){
+            // 转换为bean对象
+            return ResultUtils.success((Page<GeneratorVO>) value);
+        }
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
 
@@ -246,10 +261,13 @@ public class GeneratorController {
                 "createTime",
                 "updateTime"
         );
+
         Page<Generator> generatorPage = generatorService.page(new Page<>(current, size), queryWrapper);
 
         Page<GeneratorVO> generatorVOPage = generatorService.getGeneratorVOPage(generatorPage, request);
 
+        // 缓存数据
+        cacheManager.put(cacheKey, JSONUtil.toJsonStr(generatorVOPage));
 
         return ResultUtils.success(generatorVOPage);
     }
@@ -647,4 +665,18 @@ public class GeneratorController {
         return localZipFilePath;
     }
 
+
+    /**
+     * 获取分页缓存key
+     *
+     * @param generatorQueryRequest
+     * @return
+     */
+    private static String getPageKey(GeneratorQueryRequest generatorQueryRequest) {
+        String jsonStr = JSONUtil.toJsonStr(generatorQueryRequest);
+        // 请求参数编码,避免参数过多
+        String base64 = Base64Encoder.encode(jsonStr.getBytes());
+        String key = "generator:page:" + base64;
+        return key;
+    }
 }
