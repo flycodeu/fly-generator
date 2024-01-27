@@ -242,7 +242,9 @@ public class GeneratorController {
         long size = generatorQueryRequest.getPageSize();
         // 缓存获取数据
         String cacheKey = getPageKey(generatorQueryRequest);
+        log.info("缓存key:{}", cacheKey);
         Object value = cacheManager.get(cacheKey);
+        log.info("缓存获取数据:{}", value);
         if (value!=null){
             // 转换为bean对象
             return ResultUtils.success((Page<GeneratorVO>) value);
@@ -267,7 +269,7 @@ public class GeneratorController {
         Page<GeneratorVO> generatorVOPage = generatorService.getGeneratorVOPage(generatorPage, request);
 
         // 缓存数据
-        cacheManager.put(cacheKey, JSONUtil.toJsonStr(generatorVOPage));
+        cacheManager.put(cacheKey, generatorVOPage);
 
         return ResultUtils.success(generatorVOPage);
     }
@@ -672,7 +674,7 @@ public class GeneratorController {
      * @param generatorQueryRequest
      * @return
      */
-    private static String getPageKey(GeneratorQueryRequest generatorQueryRequest) {
+    public static String getPageKey(GeneratorQueryRequest generatorQueryRequest) {
         String jsonStr = JSONUtil.toJsonStr(generatorQueryRequest);
         // 请求参数编码,避免参数过多
         String base64 = Base64Encoder.encode(jsonStr.getBytes());
