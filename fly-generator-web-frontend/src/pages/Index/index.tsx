@@ -1,7 +1,4 @@
-import {
-  listGeneratorVoByPageFastUsingPost,
-  listGeneratorVoByPageUsingPost
-} from '@/services/backend/generatorController';
+import { listGeneratorVoByPageFastUsingPost } from '@/services/backend/generatorController';
 import { UserOutlined } from '@ant-design/icons';
 import { PageContainer, ProFormText, QueryFilter } from '@ant-design/pro-components';
 import { ProFormSelect } from '@ant-design/pro-form/lib';
@@ -174,6 +171,10 @@ const IndexPage: React.FC = () => {
                 <Flex justify={'space-between'} align={'center'}>
                   <Typography.Paragraph type={'secondary'} style={{ fontSize: 12, paddingTop: 10 }}>
                     {moment(data.updateTime).fromNow()}
+                  </Typography.Paragraph>
+
+                  <Typography.Paragraph type={'secondary'} style={{ fontSize: 12, paddingTop: 10 }}>
+                    下载：{data.downLoadCount}
                   </Typography.Paragraph>
                   <div>
                     <Avatar

@@ -99,6 +99,7 @@ declare namespace API {
     createTime?: string;
     description?: string;
     distPath?: string;
+    downLoadCount?: number;
     fileConfig?: string;
     id?: string;
     isDelete?: number;
@@ -195,6 +196,7 @@ declare namespace API {
     createTime?: string;
     description?: string;
     distPath?: string;
+    downLoadCount?: number;
     fileConfig?: FileConfig;
     id?: string;
     modelConfig?: ModelConfig;
@@ -241,6 +243,7 @@ declare namespace API {
     fileConfig?: FileConfig;
     modelConfig?: ModelConfig;
     name?: string;
+    projectName?: string;
     useGit?: boolean;
     version?: string;
   };
