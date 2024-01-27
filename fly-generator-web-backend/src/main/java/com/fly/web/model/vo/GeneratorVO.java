@@ -96,6 +96,10 @@ public class GeneratorVO implements Serializable {
      * 更新时间
      */
     private Date updateTime;
+    /**
+     * 下载次数
+     */
+    private Integer downLoadCount;
 
 
     /**

@@ -9,6 +9,7 @@ export default [
   },
   { path: '/', icon: 'home', component: './Index', name: '主页' },
   { path: '/user/settings', component: './User/Settings', icon: 'user', name: '个人设置' },
+  { path: '/user/generator', component: './User/Generator', icon: 'user', name: '我的生成器' },
   {
     path: '/test/file',
     icon: 'home',

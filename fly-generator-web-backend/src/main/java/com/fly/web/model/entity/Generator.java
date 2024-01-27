@@ -96,6 +96,11 @@ public class Generator implements Serializable {
     @TableLogic
     private Integer isDelete;
 
+    /**
+     * 下载次数
+     */
+    private Integer downLoadCount;
+
     @TableField( exist = false )
     private static final long serialVersionUID = 1L;
 }

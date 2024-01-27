@@ -245,7 +245,7 @@ public class GeneratorController {
         log.info("缓存key:{}", cacheKey);
         Object value = cacheManager.get(cacheKey);
         log.info("缓存获取数据:{}", value);
-        if (value!=null){
+        if (value != null) {
             // 转换为bean对象
             return ResultUtils.success((Page<GeneratorVO>) value);
         }
@@ -263,6 +263,8 @@ public class GeneratorController {
                 "createTime",
                 "updateTime"
         );
+
+        queryWrapper.eq("status", 1);
 
         Page<Generator> generatorPage = generatorService.page(new Page<>(current, size), queryWrapper);
 
@@ -360,6 +362,8 @@ public class GeneratorController {
         if (StrUtil.isBlank(filepath)) {
             throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "产物包不存在");
         }
+        // 设置下载次数
+        setDownLoad(generator);
 
         // 设置响应头
         response.setContentType("application/octet-stream;charset=UTF-8");
@@ -400,6 +404,16 @@ public class GeneratorController {
         }
     }
 
+    /**
+     * 设置下载次数
+     * @param generator
+     */
+    private void setDownLoad(Generator generator) {
+        Integer downLoadCount = generator.getDownLoadCount();
+        generator.setDownLoadCount(downLoadCount + 1);
+        generatorService.updateById(generator);
+    }
+
 
     /**
      * 根据项目的id下载对应的文件
@@ -427,6 +441,8 @@ public class GeneratorController {
         if (StrUtil.isBlank(distPath)) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "生成器文件不存在");
         }
+        // 设置下载次数
+        setDownLoad(generator);
         //4. 下载压缩包
         //4.1 创建工作区间
         String projectPath = System.getProperty("user.dir");
