@@ -138,7 +138,7 @@ public class CosManager {
     /**
      * 删除目录
      *
-     * @param delPrefix 包含后缀/
+     * @param delPrefix 包含后缀/ ,例如 /aa/
      * @throws CosClientException
      * @throws CosServiceException
      */
