@@ -8,15 +8,7 @@ export default [
     ],
   },
   { path: '/', icon: 'home', component: './Index', name: '主页' },
-  { path: '/user/settings', component: './User/Settings', icon: 'user', name: '个人设置' },
-  { path: '/user/generator', component: './User/Generator', icon: 'user', name: '我的生成器' },
-  {
-    path: '/test/file',
-    icon: 'home',
-    component: './Test/File',
-    name: '文件上传下载测试',
-    hideInMenu: true,
-  },
+
   {
     path: '/generator/add',
     icon: 'plus',
@@ -30,6 +22,17 @@ export default [
     name: '修改生成器',
     hideInMenu: true,
   },
+
+  { path: '/user/generator', component: './User/Generator', icon: 'user', name: '我的生成器' },
+  { path: '/user/settings', component: './User/Settings', icon: 'user', name: '个人设置' },
+  {
+    path: '/test/file',
+    icon: 'home',
+    component: './Test/File',
+    name: '文件上传下载测试',
+    hideInMenu: true,
+  },
+
   {
     path: '/generator/detail/:id',
     icon: 'home',

@@ -25,7 +25,6 @@ const GeneratorAdminPage: React.FC = () => {
   const actionRef = useRef<ActionType>();
   // 当前用户点击的数据
   const [currentRow, setCurrentRow] = useState<API.Generator>();
-  const [keys,setKeys] = useState<[]>([]);
   /**
    * 删除节点
    *
@@ -176,6 +175,7 @@ const GeneratorAdminPage: React.FC = () => {
     },
   ];
   // @ts-ignore
+  // @ts-ignore
   return (
     <div className="admin-generator-page">
       <Typography.Title level={4} style={{ marginBottom: 16 }}>
@@ -184,7 +184,7 @@ const GeneratorAdminPage: React.FC = () => {
       <ProTable<API.Generator>
         headerTitle={'查询表格'}
         actionRef={actionRef}
-        rowKey={(record) => record.id as any }
+        rowKey={(record) => record.id as any}
         search={{
           labelWidth: 120,
         }}
@@ -218,7 +218,7 @@ const GeneratorAdminPage: React.FC = () => {
         }}
         columns={columns}
         expandable={{
-          expandedRowRender: (record) => <ReactJson src={JSON.parse(record?.fileConfig)} />,
+          expandedRowRender: (record) => <ReactJson src={JSON.parse(record?.fileConfig as any)} />,
         }}
       />
       <CreateModal

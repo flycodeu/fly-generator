@@ -46,8 +46,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -261,7 +264,8 @@ public class GeneratorController {
                 "status",
                 "userId",
                 "createTime",
-                "updateTime"
+                "updateTime",
+                "downLoadCount"
         );
 
         queryWrapper.eq("status", 1);
@@ -406,6 +410,7 @@ public class GeneratorController {
 
     /**
      * 设置下载次数
+     *
      * @param generator
      */
     private void setDownLoad(Generator generator) {
@@ -488,7 +493,7 @@ public class GeneratorController {
 //        stopWatch.start();
         //6. 执行脚本
         //6.1 找到脚本
-        // 需要注意不是windows的使用generator
+        //todo 需要注意不是windows的使用generator
         File scriptFile = FileUtil.loopFiles(unzipDir, 2, null)
                 .stream()
                 .filter(file -> file.isFile() && "generator.bat".equals(file.getName()))
@@ -503,14 +508,20 @@ public class GeneratorController {
 //            Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxrwxrwx");
 //            Files.setPosixFilePermissions(scriptFile.toPath(), permissions);
 //        } catch (IOException e) {
-//
+//            throw new BusinessException(ErrorCode.SYSTEM_ERROR);
 //        }
         //6.3执行脚本
         // 构建命令
-//        stopWatch = new StopWatch();
-//        stopWatch.start();
+
+        // todo 切换win
         String scriptAbsolutePath = scriptFile.getAbsolutePath().replace("\\", "/");
         String[] commands = new String[]{scriptAbsolutePath, "json-generate", "--file=" + dataModelPath};
+
+        // mac
+//        String scriptAbsolutePath = scriptFile.getAbsolutePath();
+//        String[] commands = new String[]{scriptAbsolutePath, "json-generate", "--file=" + dataModelPath};
+
+
         File scriptDir = scriptFile.getParentFile();
         //todo 修复存在的命令行的bug
         ProcessBuilder processBuilder = new ProcessBuilder(commands);
@@ -529,12 +540,7 @@ public class GeneratorController {
         } catch (Exception e) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "执行命令失败");
         }
-        //stopWatch.stop();
-        //    System.out.println("Maven打包命令执行完毕，耗时：" + stopWatch.getTotalTimeSeconds() + "秒");
 
-//
-//        stopWatch = new StopWatch();
-//        stopWatch.start();
         //7. 压缩文件结果返回前端
         String generatePath = scriptDir.getAbsolutePath() + "/generated";
         String resultPath = tempDirPath + "/result.zip";

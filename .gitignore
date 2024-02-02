@@ -4,6 +4,8 @@ fly-generator.iml
 fly-generator-demo-projects.iml
 generated
 .temp
+xxl-job-master/xxl-job-admin/src/main/resources/application-prod.properties
+fly-generator-web-backend/src/main/resources/application-prod.yml
 ### Java template
 # Compiled class file
 *.class
