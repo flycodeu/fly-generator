@@ -47,10 +47,10 @@ create table if not exists generator
 
 
 INSERT INTO generate_db.user (id, userAccount, userPassword, userName, userAvatar, userProfile, userRole)
-VALUES (1, 'flycode', 'b0dd3697a192885d7c055db46155b26a', '程序员飞云',
+VALUES (1, 'flycode', '56a5ba871d9eea1b3233c376dea20088', '程序员飞云',
         'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png', '我有一头小毛驴我从来也不骑', 'admin');
 INSERT INTO generate_db.user (id, userAccount, userPassword, userName, userAvatar, userProfile, userRole)
-VALUES (2, 'flycode2', 'b0dd3697a192885d7c055db46155b26a', '普通飞云',
+VALUES (2, 'flycode2', '56a5ba871d9eea1b3233c376dea20088', '普通飞云',
         'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png', '我有一头小毛驴我从来也不骑', 'user');
 
 INSERT INTO generate_db.generator (id, name, description, basePackage, version, author, tags, picture, fileConfig,
