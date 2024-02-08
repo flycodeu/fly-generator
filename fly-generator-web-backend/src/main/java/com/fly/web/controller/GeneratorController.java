@@ -504,12 +504,12 @@ public class GeneratorController {
 
         //6.2 添加权限
         //todo 修复权限
-//        try {
-//            Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxrwxrwx");
-//            Files.setPosixFilePermissions(scriptFile.toPath(), permissions);
-//        } catch (IOException e) {
-//            throw new BusinessException(ErrorCode.SYSTEM_ERROR);
-//        }
+        try {
+            Set<PosixFilePermission> permissions = PosixFilePermissions.fromString("rwxrwxrwx");
+            Files.setPosixFilePermissions(scriptFile.toPath(), permissions);
+        } catch (IOException e) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR);
+        }
         //6.3执行脚本
         // 构建命令
 
