@@ -1,5 +1,5 @@
 import PictureUpload from '@/components/PictureUpload';
-import {updateMyUserUsingPost, updateUserUsingPost} from '@/services/backend/userController';
+import {updateMyUserUsingPost} from '@/services/backend/userController';
 import { useModel } from '@@/exports';
 import { PageContainer } from '@ant-design/pro-components';
 import '@umijs/max';
@@ -22,7 +22,6 @@ const UserSettingsPage: React.FC = () => {
   const onFinish = async () => {
     try {
       await updateMyUserUsingPost({
-        id: currentUser?.id,
         userName: userInfo?.userName,
         userAvatar: userInfo?.userAvatar,
         userProfile: userInfo?.userProfile,
