@@ -26,7 +26,7 @@ const Footer: React.FC = () => {
               <GithubOutlined /> 飞云源码
             </>
           ),
-          href: 'https://github.com/flybase1',
+          href: 'https://github.com/flycodeu',
           blankTarget: true,
         },
       ]}

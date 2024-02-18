@@ -112,6 +112,9 @@ const GeneratorAddPage: React.FC = () => {
             <Typography.Paragraph type="secondary">基础包：{data.basePackage}</Typography.Paragraph>
             <Typography.Paragraph type="secondary">版本：{data.version}</Typography.Paragraph>
             <Typography.Paragraph type="secondary">作者：{data.author}</Typography.Paragraph>
+            <Typography.Paragraph type="secondary">windows使用：.\generator --help</Typography.Paragraph>
+            <Typography.Paragraph type="secondary">linux使用：generator --help</Typography.Paragraph>
+
             <div style={{ marginBottom: 24 }} />
             <Space size="middle">
               <Link to={`/generator/use/${data.id}`}>
@@ -120,6 +123,7 @@ const GeneratorAddPage: React.FC = () => {
 
               {downloadButton}
               {editButton}
+
             </Space>
           </Col>
           <Col flex="320px">
