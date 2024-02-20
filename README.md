@@ -29,6 +29,23 @@
 
 
 
+## 技术选型
+
+- Spring Boot 2.7.x
+- Mysql 8
+- Mybatis Plus
+- Picocli
+- FreeMaker
+- Redis
+- XXL-JOB
+- vertx
+- caffeine
+- 腾讯云COS对象存储
+
+
+
+
+
 ## 用户使用
 
 ### 使用代码生成器
@@ -62,6 +79,12 @@
 ![image-20240220135732077](http://cdn.flycode.icu/codeCenterImg/image-20240220135732077.png)
 
 产物包必须要使用经过代码生成器工具maker制作的模板项目，里面必须包含generator脚本文件
+
+## 管理员使用
+
+![image-20240220141018693](http://cdn.flycode.icu/codeCenterImg/image-20240220141018693.png)
+
+![image-20240220141034724](http://cdn.flycode.icu/codeCenterImg/image-20240220141034724.png)
 
 ## 开发者使用
 
@@ -195,4 +218,12 @@ templateMaker1.json
 项目会生成在当前项目的.temp目录里面
 
 
+
+## 待完成功能
+
+1. 用户下载次数限流
+2. 开发代码生成器制作界面
+3. 开发代码生成器创建JSON编辑文件配置，模板配置
+4. 使用界面更加人性化，修改界面展示
+5. 引入更多的代码生成器
 
